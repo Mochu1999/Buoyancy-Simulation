@@ -145,6 +145,7 @@
     <ClInclude Include="Sources\Camera.hpp" />
     <ClInclude Include="Sources\Common.hpp" />
     <ClInclude Include="Sources\Fourier.hpp" />
+    <ClInclude Include="Sources\F_Sphere.hpp" />
     <ClInclude Include="Sources\glm\common.hpp" />
     <ClInclude Include="Sources\glm\detail\compute_common.hpp" />
     <ClInclude Include="Sources\glm\detail\compute_vector_relational.hpp" />

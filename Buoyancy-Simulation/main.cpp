@@ -25,6 +25,8 @@
 
 #include "AuxSquare.hpp"
 
+#include "F_Sphere.hpp"
+
 
 // to not render what is not visible to the camera:
 //glEnable(GL_CULL_FACE);       // Enable face culling
@@ -88,6 +90,7 @@ int main(void)
 	Camera camera(window);
 
 	AuxSquare auxSquare;
+	auxSquare.addSet(addFibSphere(1000, 50));
 
 
 	Lines3d xLine2;
@@ -134,7 +137,7 @@ int main(void)
 
 
 
-
+	
 
 
 
@@ -181,9 +184,11 @@ int main(void)
 			//polygon.draw();
 			//line.draw();
 
+			auxSquare.draw();
+
 			glUniform4f(shader.colorLocation, 135.0f / 255.0f, 0.0, 0.0, 1.0);
 
-			//auxSquare.draw(wettedSurface.intersections);
+			
 
 			glUniform1i(renderTypeLocation, 0);
 
@@ -191,15 +196,15 @@ int main(void)
 			glUniform4f(shader.colorLocation, 40.0f / 255.0f, 239.9f / 255.0f, 239.0f / 255.0f, 0.3f);
 			//glUniform4f(shader.colorLocation, 00.0f / 255.0f, 204.0f / 255.0f, 0.0f / 255.0f, 0.1f);
 			//printflat(fourier.indices);
-			fourier.createWavePositions();
-			fourier.draw();
+			//fourier.createWavePositions();
+			//fourier.draw();
 			//newfourier.draw();
 			
 			glUniform1i(renderTypeLocation, 1);
 			glUniform4f(shader.colorLocation, 0, 0, 0.0, 1.0);
 			for (auto& line : fourier.lines)
 			{
-				line.draw();
+				//line.draw();
 			}
 			
 			camera.updateCamera();

@@ -914,7 +914,13 @@
     <ClInclude Include="Sources\WettedSurface.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\F_Sphere.hpp">
+    <ClInclude Include="Sources\Delaunay_2D.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Spheres.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Time.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

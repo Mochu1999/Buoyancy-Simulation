@@ -21,12 +21,13 @@
 #include <unordered_set>
 #include <set>
 #include <unordered_map>
+#include <map>
 #include <list>
 #include <deque>
 
-#include <chrono>
-using namespace std;
-using namespace std::chrono;
+#include "Time.hpp"
+#include <functional>
+#include <random>
 
 //not templated definitions of functions need to be separated from their declarations
 
@@ -39,7 +40,7 @@ struct vec2 {
 
 	vec2(T x, T y) : x(x), y(y) {} //normal constructor
 
-	// operator overloads
+	// Operator overloads for comparison
 	bool operator == (const vec2& other) const {
 		return x == other.x && y == other.y;
 	}
@@ -48,6 +49,7 @@ struct vec2 {
 		return !(*this == other);
 	}
 
+	// Operator overloads for arithmetic
 	vec2 operator + (const vec2& other) const {
 		return { x + other.x, y + other.y };
 	}
@@ -57,24 +59,83 @@ struct vec2 {
 	}
 
 	vec2 operator *(T scalar) const {
-		return { x * scalar, y * scalar};
+		return { x * scalar, y * scalar };
 	}
 
 	vec2 operator /(T scalar) const {
 		return { x / scalar, y / scalar };
 	}
 
-	T dot(const vec2& other) const {
-		return x * other.x + y * other.y;
+	// Compound assignment operators
+	vec2& operator += (const vec2& other) {
+		x += other.x;
+		y += other.y;
+		return *this;
 	}
 
-	T cross(const vec2& other) const {
-		return x * other.y - y * other.x;
+	vec2& operator -= (const vec2& other) {
+		x -= other.x;
+		y -= other.y;
+		return *this;
+	}
+
+	vec2& operator *= (T scalar) {
+		x *= scalar;
+		y *= scalar;
+		return *this;
+	}
+
+	vec2& operator /= (T scalar) {
+		x /= scalar;
+		y /= scalar;
+		return *this;
+	}
+	bool operator < (const vec2& other) const {
+		if (x == other.x) return y < other.y;
+		return x < other.x;
 	}
 };
 
+
+
 using p = vec2<float>;
 using ui2 = vec2<unsigned int>;
+
+//needed for the unordered_maps that take p as keys, it could be inside vec2, but this is more idiomatic
+//umaps have average looking times of O(1), compared with O(logn) of map
+struct p_hash {
+	std::size_t operator()(const p& point) const {
+		return std::hash<float>()(point.x) ^ (std::hash<float>()(point.y) << 1);
+	}
+};
+
+
+//there are a lot of hash functions, 
+struct p_hash_multiplicative {
+	std::size_t operator()(const p& point) const {
+		constexpr std::uint64_t k = 0x9ddfea08eb382d69ULL;
+		std::uint64_t a, b;
+
+		std::memcpy(&a, &point.x, sizeof(std::uint64_t));
+		std::memcpy(&b, &point.y, sizeof(std::uint64_t));
+
+		return (a * k) ^ (b * k);
+	}
+};
+
+
+
+//sum of products, is also equal to v1*v2*cos(theta)
+template<typename T>
+T dot2(const vec2<T>& v1, const vec2<T>& v2) {
+	return v1.x * v2.x + v1.y * v2.y;
+}
+
+
+template<typename T>
+T cross2(const vec2<T>& v1, const vec2<T>& v2) {
+	return v1.x * v2.y - v1.y * v2.x;
+}
 
 
 
@@ -190,6 +251,15 @@ void print_without_macro(const string& name, const T& item) {
 	cout << name << ": " << item << endl;
 }
 
+#define printp(var) printp_without_macro(#var, var)
+template<typename T>
+void printp_without_macro(const string& name, const T& items) {
+	stringstream ss;
+	ss << name << endl;
+	ss << "{" << items.x << "," << items.y << "}";
+
+	cout << ss.str() << endl << endl;
+}
 
 #define printv2(var) printv2_without_macro(#var, var)
 template<typename T>
@@ -206,6 +276,7 @@ void printv2_without_macro(const string& name, const vector<vec2<T>>& items) {
 	cout << ss.str() << endl << endl;
 }
 
+//print vector of p3
 #define printv3(var) printv3_without_macro(#var, var)
 template<typename T>
 void printv3_without_macro(const string& name, const vector<vec3<T>>& items) {
@@ -302,3 +373,5 @@ std::array<float, 4> multiplyQuaternions(const std::array<float, 4>& a, const st
 p3 rotatePoint(const p3& point, const std::array<float, 4>& rotationQuaternion);
 
 float isBelowTriangle(const p3& a, const p3& b, const p3& c, const p3& p);
+
+

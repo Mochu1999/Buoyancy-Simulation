@@ -10,6 +10,8 @@ struct AuxSquare {
 
 	vector<vector<Polygons>> allSquares;
 
+	float s = 0.4f;
+
 	void addSet(vector<p3> positions) {
 
 		allSquares.clear();
@@ -28,12 +30,12 @@ struct AuxSquare {
 		vector<Polygons> square;
 		square.resize(6);
 
-		square[0].addSet({ p3{-0.2f, -0.2f, -0.2f} + pos, p3{ 0.2f,-0.2f,-0.2f } + pos, p3{ 0.2f,-0.2f,0.2f } + pos,p3{ -0.2f,-0.2f,0.2f } + pos, p3{ -0.2f,-0.2f,-0.2f } + pos });
-		square[1].addSet({ p3{-0.2f, 0.2f, -0.2f} + pos, p3{ 0.2f,0.2f,-0.2f } + pos,p3{ 0.2f,0.2f,0.2f } + pos, p3{ -0.2f,0.2f,0.2f } + pos,p3{ -0.2f,0.2f,-0.2f } + pos });
-		square[2].addSet({ p3{-0.2f, -0.2f, -0.2f} + pos, p3{ 0.2f,-0.2f,-0.2f } + pos, p3{ 0.2f,0.2f,-0.2f } + pos,p3{-0.2f, 0.2f, -0.2f} + pos, p3{ -0.2f,-0.2f,-0.2f} + pos });
-		square[3].addSet({ p3{-0.2f, -0.2f, 0.2f} + pos, p3{ 0.2f,-0.2f,0.2f } + pos,p3{ 0.2f,0.2f,0.2f } + pos, p3{-0.2f, 0.2f, 0.2f} + pos,p3{ -0.2f,-0.2f,0.2f } + pos });
-		square[4].addSet({ p3{-0.2f, -0.2f, -0.2f } + pos, p3{ -0.2f,-0.2f,0.2f } + pos, p3{ -0.2f,0.2f,0.2f } + pos,p3{-0.2f, 0.2f, -0.2f} + pos, p3{ -0.2f,-0.2f,-0.2f } + pos });
-		square[5].addSet({ p3{0.2f, -0.2f, -0.2f} + pos, p3{ 0.2f,-0.2f,0.2f } + pos,p3{ 0.2f,0.2f,0.2f } + pos, p3{0.2f, 0.2f, -0.2f} + pos,p3{ 0.2f,-0.2f,-0.2f } + pos });
+		square[0].addSet({ p3{-s, -s, -s} + pos, p3{ s,-s,-s } + pos, p3{ s,-s,s } + pos,p3{ -s,-s,s } + pos, p3{ -s,-s,-s } + pos });
+		square[1].addSet({ p3{-s, s, -s} + pos, p3{ s,s,-s } + pos,p3{ s,s,s } + pos, p3{ -s,s,s } + pos,p3{ -s,s,-s } + pos });
+		square[2].addSet({ p3{-s, -s, -s} + pos, p3{ s,-s,-s } + pos, p3{ s,s,-s } + pos,p3{-s, s, -s} + pos, p3{ -s,-s,-s} + pos });
+		square[3].addSet({ p3{-s, -s, s} + pos, p3{ s,-s,s } + pos,p3{ s,s,s } + pos, p3{-s, s, s} + pos,p3{ -s,-s,s } + pos });
+		square[4].addSet({ p3{-s, -s, -s } + pos, p3{ -s,-s,s } + pos, p3{ -s,s,s } + pos,p3{-s, s, -s} + pos, p3{ -s,-s,-s } + pos });
+		square[5].addSet({ p3{s, -s, -s} + pos, p3{ s,-s,s } + pos,p3{ s,s,s } + pos, p3{s, s, -s} + pos,p3{ s,-s,-s } + pos });
 		
 		return square;
 	}
@@ -59,12 +61,12 @@ struct AuxSquare {
 //
 //		square.resize(6);
 //
-//		square[0].addSet({ p3{-0.2f, -0.2f, -0.2f} + pos, p3{ 0.2f,-0.2f,-0.2f } + pos, p3{ 0.2f,-0.2f,0.2f } + pos,p3{ -0.2f,-0.2f,0.2f } + pos, p3{ -0.2f,-0.2f,-0.2f } + pos });
-//		square[1].addSet({ p3{-0.2f, 0.2f, -0.2f} + pos, p3{ 0.2f,0.2f,-0.2f } + pos,p3{ 0.2f,0.2f,0.2f } + pos, p3{ -0.2f,0.2f,0.2f } + pos,p3{ -0.2f,0.2f,-0.2f } + pos });
-//		square[2].addSet({ p3{-0.2f, -0.2f, -0.2f} + pos, p3{ 0.2f,-0.2f,-0.2f } + pos, p3{ 0.2f,0.2f,-0.2f } + pos,p3{-0.2f, 0.2f, -0.2f} + pos, p3{ -0.2f,-0.2f,-0.2f} + pos });
-//		square[3].addSet({ p3{-0.2f, -0.2f, 0.2f} + pos, p3{ 0.2f,-0.2f,0.2f } + pos,p3{ 0.2f,0.2f,0.2f } + pos, p3{-0.2f, 0.2f, 0.2f} + pos,p3{ -0.2f,-0.2f,0.2f } + pos });
-//		square[4].addSet({ p3{-0.2f, -0.2f, -0.2f } + pos, p3{ -0.2f,-0.2f,0.2f } + pos, p3{ -0.2f,0.2f,0.2f } + pos,p3{-0.2f, 0.2f, -0.2f} + pos, p3{ -0.2f,-0.2f,-0.2f } + pos });
-//		square[5].addSet({ p3{0.2f, -0.2f, -0.2f} + pos, p3{ 0.2f,-0.2f,0.2f } + pos,p3{ 0.2f,0.2f,0.2f } + pos, p3{0.2f, 0.2f, -0.2f} + pos,p3{ 0.2f,-0.2f,-0.2f } + pos });
+//		square[0].addSet({ p3{-s, -s, -s} + pos, p3{ s,-s,-s } + pos, p3{ s,-s,s } + pos,p3{ -s,-s,s } + pos, p3{ -s,-s,-s } + pos });
+//		square[1].addSet({ p3{-s, s, -s} + pos, p3{ s,s,-s } + pos,p3{ s,s,s } + pos, p3{ -s,s,s } + pos,p3{ -s,s,-s } + pos });
+//		square[2].addSet({ p3{-s, -s, -s} + pos, p3{ s,-s,-s } + pos, p3{ s,s,-s } + pos,p3{-s, s, -s} + pos, p3{ -s,-s,-s} + pos });
+//		square[3].addSet({ p3{-s, -s, s} + pos, p3{ s,-s,s } + pos,p3{ s,s,s } + pos, p3{-s, s, s} + pos,p3{ -s,-s,s } + pos });
+//		square[4].addSet({ p3{-s, -s, -s } + pos, p3{ -s,-s,s } + pos, p3{ -s,s,s } + pos,p3{-s, s, -s} + pos, p3{ -s,-s,-s } + pos });
+//		square[5].addSet({ p3{s, -s, -s} + pos, p3{ s,-s,s } + pos,p3{ s,s,s } + pos, p3{s, s, -s} + pos,p3{ s,-s,-s } + pos });
 //	}
 //	void draw(vector<p3> positions) {
 //

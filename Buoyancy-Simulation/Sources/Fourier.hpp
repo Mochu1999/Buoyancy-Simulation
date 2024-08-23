@@ -131,7 +131,7 @@ struct Fourier {
 
 		indices.reserve(segments * segments * 6); //checked
 		//indices.insert(indices.end(), { 0,3,1 });
-		print(segments);
+		//print(segments);
 		for (int z = 0; z < segments; ++z)
 		{
 			for (int x = 0; x < segments; ++x)

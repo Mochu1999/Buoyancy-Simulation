@@ -13,16 +13,16 @@ struct Camera {
 	float fov = 45.0f * PI / 180;
 	float aspectRatio = windowWidth / windowHeight;
 	float nearZ = 0.1f;
-	float farZ = 300.0f;
+	float farZ = 3000.0f;
 
 	std::array<float, 16> perspectiveMatrix;
 	std::array<float, 16> viewMatrix;
 	std::array<float, 16> vpMatrix;
 
-	p3 cameraPos = { 45.1553,49.5914,132.395 };// { 50.0, 10.0, -10.0 };
+	p3 cameraPos =  { 0.0, -200.0, 0.0 };
 
-	//p3 forward = { -1.0f,0.0f,1.0f };
-	p3 forward = { 0.0304847,-0.556371,-0.828342 };
+	//p3 forward = { 0.0f,-1.0f,0.0f };
+	p3 forward = { 0.0,1.0,-0.1 };
 	p3 right; //0 because are gettin recalculated anyways
 	p3 up;
 

@@ -74,9 +74,13 @@ struct Polygons {
 
 	void clear();
 
+	//a ver, addSet lleva dentro sweeptriangulation, pero sweep triangulation no me funciona, yo que sé, voy a crear uno para las esferas y te dejo a ti enterarte de que lo que
+
+	
+
 	void addSet(vector<p3> items);
 
-	void sweepTriangulation(/*int i*/);
+	void sweepTriangulation();
 
 	//auxiliar functions for sweepTriangulation
 	void trChainBack(const unsigned int& currentChain);

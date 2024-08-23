@@ -214,7 +214,7 @@ cout << "MODELPATH " << modelPath << endl;*/
 			inFile.read(reinterpret_cast<char*>(&size), sizeof(size));
 			model.resize(size);
 			inFile.read(reinterpret_cast<char*>(model.data()), size * sizeof(p3));
-			printv3(model);
+			//printv3(model);
 		}
 		inFile.close();
 

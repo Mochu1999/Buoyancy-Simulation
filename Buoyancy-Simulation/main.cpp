@@ -25,7 +25,10 @@
 
 #include "AuxSquare.hpp"
 
-#include "F_Sphere.hpp"
+#include "Spheres.hpp"
+
+#include "Delaunay_2D.hpp"
+
 
 
 // to not render what is not visible to the camera:
@@ -78,7 +81,7 @@ int main(void)
 	BinariesManager binariesManager;
 
 	model = { {25,0,25},{45,0,25} ,{45,20,25},{35,30,25} ,{25,20,25},{25,0,25} };
-	printv3(model);
+	//printv3(model);
 	
 	Auxiliary_Elements groundLines;
 
@@ -88,9 +91,51 @@ int main(void)
 
 
 	Camera camera(window);
-
+	
+	//21.77
+	//19 after removing the lists
+	TimeCounter tc;
+	Lines3d trLines;
 	AuxSquare auxSquare;
-	auxSquare.addSet(addFibSphere(1000, 50));
+	vector<p3> spherePoints = addFibSphere(10000, 100);
+	std::vector<p3> projectedPoints = stereographicProjection(spherePoints);
+
+
+	vector<p> projectedPoints2d = p3ToP2(projectedPoints);
+
+	vector<unsigned int> lidIndices, uselessVector;
+	vector<Triangle> delaunay = bowyerWatson(projectedPoints2d, lidIndices);
+
+	//printflat(lidIndices);
+
+	vector<p> lidPoints;
+	for (const auto& i : lidIndices)
+	{
+		//cout << "i: " << i << ", spherePoints[i]: {" << spherePoints[i].x << ", " << spherePoints[i].y << "}" << endl;
+		lidPoints.push_back(p{ spherePoints[i].x,spherePoints[i].z });
+		
+	}
+
+	//printv2(lidPoints);
+	vector<Triangle> delaunay2 = bowyerWatson(lidPoints, uselessVector);
+	
+	//vector<p3> lid = p2ToP3(lidIndices);
+	trLines.addSet(spherePoints);
+	//auxSquare.addSet(spherePoints);
+
+	trLines.indices = generateIndices(projectedPoints2d, delaunay);
+	vector<unsigned int> secondIndices= generateIndices(lidPoints, delaunay2);
+	trLines.indices.insert(trLines.indices.end(), secondIndices.begin(), secondIndices.end());
+
+	tc.endCounter();
+
+	/*printv3(trLines.positions);
+	printflat(trLines.indices);*/
+
+	
+
+
+
 
 
 	Lines3d xLine2;
@@ -106,8 +151,7 @@ int main(void)
 
 	Polygons polygon;
 	polygon.addSet(model);
-	printv3(polygon.positions);
-	printv3(polygon.positions);
+
 
 
 
@@ -136,6 +180,7 @@ int main(void)
 
 
 
+	
 
 	
 
@@ -184,6 +229,10 @@ int main(void)
 			//polygon.draw();
 			//line.draw();
 
+			//triangles.lines.draw();
+			//triangles.draw();
+			
+			trLines.draw();
 			auxSquare.draw();
 
 			glUniform4f(shader.colorLocation, 135.0f / 255.0f, 0.0, 0.0, 1.0);

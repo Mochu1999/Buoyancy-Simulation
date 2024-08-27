@@ -111,7 +111,7 @@ struct p_hash {
 
 
 //there are a lot of hash functions, 
-struct p_hash_multiplicative {
+struct p_HashMultiplicative {
 	std::size_t operator()(const p& point) const {
 		constexpr std::uint64_t k = 0x9ddfea08eb382d69ULL;
 		std::uint64_t a, b;
@@ -123,7 +123,16 @@ struct p_hash_multiplicative {
 	}
 };
 
+struct pair_hash_multiplicative {
+    std::size_t operator()(const std::pair<p, p>& edge) const {
+        p_HashMultiplicative ph;
+        std::size_t h1 = ph(edge.first);
+        std::size_t h2 = ph(edge.second);
 
+        // Combine the two hashes
+        return h1 ^ (h2 * 0x9e3779b97f4a7c15ULL); // Using another large constant
+    }
+};
 
 //sum of products, is also equal to v1*v2*cos(theta)
 template<typename T>

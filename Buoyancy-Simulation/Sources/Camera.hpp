@@ -19,10 +19,10 @@ struct Camera {
 	std::array<float, 16> viewMatrix;
 	std::array<float, 16> vpMatrix;
 
-	p3 cameraPos =  { 0.0, -200.0, 0.0 };
+	p3 cameraPos =  { 50.0, 50.0, 50.0 };
 
-	//p3 forward = { 0.0f,-1.0f,0.0f };
-	p3 forward = { 0.0,1.0,-0.1 };
+	//p3 forward = { 0.0f,-1.0f,0.0f }; //cuando dejó esto de funcionar?
+	p3 forward = normalize3(p3{ -0.2,-1,-0.8 });
 	p3 right; //0 because are gettin recalculated anyways
 	p3 up;
 

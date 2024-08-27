@@ -25,7 +25,7 @@ struct Fourier {
 	unsigned int vertexBuffer;
 	unsigned int vertexArray;
 	unsigned int indexBuffer;
-	unsigned int normalsVBO;
+	unsigned int normalsBuffer;
 
 
 
@@ -126,6 +126,7 @@ struct Fourier {
 			normal = normalize3(normal);
 		}
 	}
+
 	void createIndices() {
 		indices.clear();
 
@@ -168,7 +169,7 @@ struct Fourier {
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 				glBufferData(GL_ELEMENT_ARRAY_BUFFER, currentIndicesBufferSize, nullptr, usageHint);
 
-				glBindBuffer(GL_ARRAY_BUFFER, normalsVBO);
+				glBindBuffer(GL_ARRAY_BUFFER, normalsBuffer);
 				glBufferData(GL_ARRAY_BUFFER, currentPositionsBufferSize, nullptr, usageHint);
 
 			}
@@ -179,7 +180,7 @@ struct Fourier {
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 			glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, currentIndicesDataSize, indices.data());
 
-			glBindBuffer(GL_ARRAY_BUFFER, normalsVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, normalsBuffer);
 			glBufferSubData(GL_ARRAY_BUFFER, 0, currentPositionsDataSize, normals.data());
 
 			isBufferUpdated = false;
@@ -197,14 +198,14 @@ struct Fourier {
 
 		glGenBuffers(1, &vertexBuffer);
 		glGenBuffers(1, &indexBuffer);
-		glGenBuffers(1, &normalsVBO);
+		glGenBuffers(1, &normalsBuffer);
 
 		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-		glBindBuffer(GL_ARRAY_BUFFER, normalsVBO);
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, normalsVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, normalsBuffer);
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, normalsBuffer);
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glBindVertexArray(0);
@@ -214,5 +215,6 @@ struct Fourier {
 		glDeleteVertexArrays(1, &vertexArray);
 		glDeleteBuffers(1, &vertexBuffer);
 		glDeleteBuffers(1, &indexBuffer);
+		glDeleteBuffers(1, &normalsBuffer);
 	}
 };

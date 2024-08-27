@@ -82,7 +82,7 @@ int main(void)
 
 	model = { {25,0,25},{45,0,25} ,{45,20,25},{35,30,25} ,{25,20,25},{25,0,25} };
 	//printv3(model);
-	
+
 	Auxiliary_Elements groundLines;
 
 
@@ -91,48 +91,15 @@ int main(void)
 
 
 	Camera camera(window);
-	
-	//21.77
-	//19 after removing the lists
-	TimeCounter tc;
-	Lines3d trLines;
-	AuxSquare auxSquare;
-	vector<p3> spherePoints = addFibSphere(10000, 100);
-	std::vector<p3> projectedPoints = stereographicProjection(spherePoints);
 
 
-	vector<p> projectedPoints2d = p3ToP2(projectedPoints);
 
-	vector<unsigned int> lidIndices, uselessVector;
-	vector<Triangle> delaunay = bowyerWatson(projectedPoints2d, lidIndices);
+	Sphere sphere(20,100);
 
-	//printflat(lidIndices);
+	sphere.addSet({ 30,30,30 });
 
-	vector<p> lidPoints;
-	for (const auto& i : lidIndices)
-	{
-		//cout << "i: " << i << ", spherePoints[i]: {" << spherePoints[i].x << ", " << spherePoints[i].y << "}" << endl;
-		lidPoints.push_back(p{ spherePoints[i].x,spherePoints[i].z });
-		
-	}
 
-	//printv2(lidPoints);
-	vector<Triangle> delaunay2 = bowyerWatson(lidPoints, uselessVector);
-	
-	//vector<p3> lid = p2ToP3(lidIndices);
-	trLines.addSet(spherePoints);
-	//auxSquare.addSet(spherePoints);
 
-	trLines.indices = generateIndices(projectedPoints2d, delaunay);
-	vector<unsigned int> secondIndices= generateIndices(lidPoints, delaunay2);
-	trLines.indices.insert(trLines.indices.end(), secondIndices.begin(), secondIndices.end());
-
-	tc.endCounter();
-
-	/*printv3(trLines.positions);
-	printflat(trLines.indices);*/
-
-	
 
 
 
@@ -180,9 +147,9 @@ int main(void)
 
 
 
-	
 
-	
+
+
 
 
 
@@ -231,31 +198,39 @@ int main(void)
 
 			//triangles.lines.draw();
 			//triangles.draw();
-			
-			trLines.draw();
-			auxSquare.draw();
 
-			glUniform4f(shader.colorLocation, 135.0f / 255.0f, 0.0, 0.0, 1.0);
+			/*trLines.draw();
+			auxSquare.draw();*/
 
 			
+
+			
+
+
 
 			glUniform1i(renderTypeLocation, 0);
 
+			
 
 			glUniform4f(shader.colorLocation, 40.0f / 255.0f, 239.9f / 255.0f, 239.0f / 255.0f, 0.3f);
 			//glUniform4f(shader.colorLocation, 00.0f / 255.0f, 204.0f / 255.0f, 0.0f / 255.0f, 0.1f);
 			//printflat(fourier.indices);
 			//fourier.createWavePositions();
 			//fourier.draw();
-			//newfourier.draw();
-			
+			//sphere.draw();
+
+
 			glUniform1i(renderTypeLocation, 1);
 			glUniform4f(shader.colorLocation, 0, 0, 0.0, 1.0);
 			for (auto& line : fourier.lines)
 			{
 				//line.draw();
 			}
-			
+
+			glUniform4f(shader.colorLocation, 135.0f / 255.0f, 0.0, 0.0, 1);
+			sphere.drawLines();
+			//sphere.draw();
+
 			camera.updateCamera();
 			glUniformMatrix4fv(locationMVP, 1, GL_FALSE, camera.vpMatrix.data());
 			glUniformMatrix4fv(locationView, 1, GL_FALSE, camera.viewMatrix.data());

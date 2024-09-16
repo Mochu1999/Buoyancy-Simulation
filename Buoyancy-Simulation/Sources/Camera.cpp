@@ -4,6 +4,7 @@ array<float, 16> Camera::createPerspectiveMatrix() {
 	array<float, 16> perspectiveMatrix = {};
 
 	float tanHalfFov = tan(fov / 2);
+	
 	perspectiveMatrix[0] = 1 / (aspectRatio * tanHalfFov);
 	perspectiveMatrix[5] = 1 / (tanHalfFov);
 	perspectiveMatrix[10] = -(farZ + nearZ) / (farZ - nearZ);

@@ -10,9 +10,11 @@ struct AuxSquare {
 
 	vector<vector<Polygons>> allSquares;
 
-	float s = 0.4f;
+	float s;
 
-	void addSet(vector<p3> positions) {
+	AuxSquare(float s_ = 0.4) :s(s_){}
+
+	void addSet(vector<p3> positions){
 
 		allSquares.clear();
 		allSquares.resize(positions.size());

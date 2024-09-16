@@ -27,7 +27,7 @@ std::vector<p3> addFibSphere(int n, float radius) {
 		points.emplace_back(p3{ x * radius, y * radius, z * radius });
 	}
 
-	//printv3(points);
+
 	return points;
 }
 
@@ -56,13 +56,6 @@ std::vector<p> stereographicProjection(const std::vector<p3>& positions) {
 	return projectedPoints;
 }
 
-//Hola, esto esta turbo caotico, vas a tener que darte una buena vuelta, lo siento. isBufferUpdated funciona mal. mesh no está del todo aislado, creo
-// que me hubiera gustado separar completamente la funcionalidad. Si lo haces comenta que addSet tiene que estar siempre antes de los indices y decide 
-// si te convence que el metodo sea así, a mi ahora mismo es que no podría importarme menos. También acabo de darme cuenta que no estoy tomando las 
-// posiciones, lo haría en una funcion aparte, classic addSet. También haría que n_ de normal se haga un valor que sea función del radio si no se 
-// especifica. Ya lo siguiente va a ser full iluminación. Siento dejarte con el marrón, siento no haber sido suficiente, siento haber malgastado mi día
-// , por algún motivo tengo confianza en ti, siento el patronizing, no tengo ningún derecho, pero no quiero morir sin haber conseguido nada. Tú te irás
-// a la cama miserable como me voy yo, solo podemos creer en que si nos sacrificamos el suficiente tiempo ,alguién se irá a la cama satisfecho de una vez.
 
 //If you want to draw the mesh lines instead of the triangles, it is currently using Lines3d for it
 struct Sphere {
@@ -128,8 +121,8 @@ struct Sphere {
 		vector<Triangle> delaunay2 = bowyerWatson(lidPoints);
 
 
-		meshLines.addSet(positions);
-
+		
+		meshLines.addSet(positions,0);
 
 		meshIndices = generateMeshIndices(projectedPoints, delaunay);
 		vector<unsigned int> secondMeshIndices = generateMeshIndices(lidPoints, delaunay2);
@@ -139,11 +132,16 @@ struct Sphere {
 
 		
 
+
+
 		indices = generateTrIndices(projectedPoints, delaunay);
 		vector<unsigned int> secondTrIndices = generateTrIndices(lidPoints, delaunay2);
 		indices.reserve(indices.size() + secondTrIndices.size());
 		indices.insert(indices.end(), secondTrIndices.begin(), secondTrIndices.end());
+
 	}
+
+
 
 	void addSet(p3 location) {
 		for (auto& pos : positions)
@@ -154,37 +152,34 @@ struct Sphere {
 
 		meshLines.addSet(positions);
 		meshLines.indices = meshIndices;
+
+		calculateNormals();
 	}
 
 	//las tapas van mal
 	void calculateNormals() {
 		normals.clear();
-		normals.resize(positions.size(), { 0,0,0 });
+		normals.reserve(indices.size() * inv3);
 
-		for (int i = 0; i < indices.size(); i += 3) {
-			vec3<float> pos1 = positions[indices[i]];
-			vec3<float> pos2 = positions[indices[i + 1]];
-			vec3<float> pos3 = positions[indices[i + 2]];
+		for (int i = 0; i < indices.size(); i += 3) 
+		{
+			p3 n = normal(positions[indices[i]], positions[indices[i + 1]], positions[indices[i + 2]]);
 
-			vec3<float> normal = normalize3(cross3(pos2 - pos1, pos3 - pos1));
+			if (dot3(n, positions[indices[i]]) < 0)
+			{
+				std::swap(indices[i + 1], indices[i + 2]);
+				n = normal(positions[indices[i]], positions[indices[i + 1]], positions[indices[i + 2]]);
+			}
 
-			normals[indices[i]] = normals[indices[i]] + normal;
-			normals[indices[i + 1]] = normals[indices[i + 1]] + normal;
-			normals[indices[i + 2]] = normals[indices[i + 2]] + normal;
+			normals.emplace_back(n);
 		}
 
-		// Normalize the normals
-		for (vec3<float>& normal : normals) {
-			normal = normalize3(normal);
-		}
 	}
 	void drawLines() {
 		meshLines.draw();
 	}
 
 	void draw() {
-
-		//calculateNormals();
 
 		glBindVertexArray(vertexArray);
 
@@ -240,9 +235,9 @@ struct Sphere {
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, normalsBuffer);
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, normalsBuffer);
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
 		glBindVertexArray(0);
 	}
 
@@ -254,3 +249,4 @@ struct Sphere {
 		positions.clear(); indices.clear();
 	}
 };
+

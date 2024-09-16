@@ -100,20 +100,34 @@ struct Lines3d {
 
 
 	//One set per lines
-	void addSet(const vector<p3>& items) {
-		positions.clear(); indices.clear();
+	void addSet(const vector<p3>& items, int isConsecutiveIndices = 1) {
 
+		positions.clear(); 
 		positions.reserve(items.size());
-		indices.reserve(items.size());
-
 		positions.insert(positions.end(), items.begin(), items.end());
 
-		for (unsigned int i = 0; i < items.size() - 1; i++)
+		//consecutive
+		if (isConsecutiveIndices==1)
 		{
-			indices.emplace_back(i);
-			indices.emplace_back(i + 1);
+			indices.clear();
+			indices.reserve(items.size());
+			for (unsigned int i = 0; i < items.size() - 1; i++)
+			{
+				indices.emplace_back(i);
+				indices.emplace_back(i + 1);
+			}
 		}
-
+		//pairs
+		else if (isConsecutiveIndices == 2)
+		{
+			indices.clear();
+			indices.reserve(items.size());
+			for (unsigned int i = 0; i < items.size() - 1; i+=2)
+			{
+				indices.emplace_back(i);
+				indices.emplace_back(i + 1);
+			}
+		}
 		isBufferUpdated = true;
 	}
 

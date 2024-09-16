@@ -140,6 +140,7 @@
     <ClCompile Include="Sources\WettedSurface.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Sources\Arrows.hpp" />
     <ClInclude Include="Sources\auxiliary_elements.h" />
     <ClInclude Include="Sources\AuxSquare.hpp" />
     <ClInclude Include="Sources\BinariesManager.h" />
@@ -432,6 +433,7 @@
     <ClInclude Include="Sources\KeyMouseImputs.hpp" />
     <ClInclude Include="Sources\Lines3d.hpp" />
     <ClInclude Include="Sources\Polygons.hpp" />
+    <ClInclude Include="Sources\Pyramid.hpp" />
     <ClInclude Include="Sources\shader.h" />
     <ClInclude Include="Sources\Spheres.hpp" />
     <ClInclude Include="Sources\Time.hpp" />

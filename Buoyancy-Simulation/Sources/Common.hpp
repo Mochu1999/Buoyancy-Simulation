@@ -2,7 +2,7 @@
 
 //common file that does not depend on other files
 
-
+using namespace std;
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -177,6 +177,10 @@ struct vec3 {
 		return { x * scalar, y * scalar, z * scalar };
 	}
 
+	vec3 operator /(T scalar) const {
+		return { x / scalar, y / scalar, z / scalar };
+	}
+
 	vec3& operator += (const vec3& other) {
 		x += other.x;
 		y += other.y;
@@ -184,13 +188,31 @@ struct vec3 {
 		return *this;
 	}
 
-	vec3& operator -= (const vec3& other) {
-		x += other.x;
-		y += other.y;
-		z += other.z;
+	vec3& operator += (T scalar) {
+		x += scalar;
+		y += scalar;
+		z += scalar;
 		return *this;
 	}
 
+	vec3& operator -= (const vec3& other) {
+		x -= other.x;
+		y -= other.y;
+		z -= other.z;
+		return *this;
+	}
+	vec3& operator *= (T scalar) {
+		x *= scalar;
+		y *= scalar;
+		z *= scalar;
+		return *this;
+	}
+	vec3& operator /= (T scalar) {
+		x /= scalar;
+		y /= scalar;
+		z /= scalar;
+		return *this;
+	}
 };
 
 using p3 = vec3<float>;
@@ -218,7 +240,7 @@ float fastInverseSqrt(float number);
 
 template<typename T>
 vec3<T> normalize3(const vec3<T>& v) {
-    float magnitudeSquared = v.x * v.x + v.y * v.y + v.z * v.z;
+    T magnitudeSquared = v.x * v.x + v.y * v.y + v.z * v.z;
     if (magnitudeSquared == 0.0f) {
         return vec3<T>(0, 0, 0); // Return a zero vector to avoid division by zero
     }
@@ -247,7 +269,7 @@ inline vector<p3> model;// = { {25,0,25},{25 + 20,0,25} ,{25 + 20,20,25} ,{25,20
 // Constants
 constexpr double PI = 3.14159265358979323846;
 constexpr double halfPI = PI/2;
-
+constexpr float inv3 = 1.0f / 3;
 
 
 
@@ -328,21 +350,9 @@ void printp3_without_macro(const string& name, const T& items) {
 	cout << ss.str() << endl << endl;
 }
 
-//#define printm16(var) printm16_without_macro(#var, var)
-//void printm16_without_macro(const string& name, const std::array<float, 16>& matrix) {
-//	stringstream ss;
-//	ss << name << endl;
-//	//ss << "{";
-//	for (int row = 0; row < 4; ++row) {
-//		for (int col = 0; col < 4; ++col) {
-//			// For column-major order, the column changes fastest.
-//			ss << matrix[col * 4 + row] << " ";
-//		}
-//		ss << std::endl; // Newline at the end of each row
-//	}
-//	//ss << "}";
-//	cout << ss.str() << endl << endl;
-//}
+#define printm16(var) printm16_without_macro(#var, var)
+
+void printm16_without_macro(const std::string& name, const std::array<float, 16>& matrix);
 
 
 
@@ -384,3 +394,13 @@ p3 rotatePoint(const p3& point, const std::array<float, 4>& rotationQuaternion);
 float isBelowTriangle(const p3& a, const p3& b, const p3& c, const p3& p);
 
 
+
+template<typename T>
+vec3<T> centroid(const vec3<T>& p1, const vec3<T>& p2, const vec3<T>& p3) {
+	return (p1 + p2 + p3)*inv3;
+}
+
+template<typename T>
+vec3<T> normal(const vec3<T>& p1, const vec3<T>& p2, const vec3<T>& p3) {
+	return normalize3(cross3(p2 - p1, p3 - p1));
+}

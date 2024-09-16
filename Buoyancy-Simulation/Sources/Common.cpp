@@ -81,4 +81,18 @@ float isBelowTriangle(const p3& a, const p3& b, const p3& c, const p3& p) {
 }
 
 
+void printm16_without_macro(const std::string& name, const std::array<float, 16>& matrix)
+{
+	std::stringstream ss;
+	ss << name << " = " << std::endl;
 
+	for (int row = 0; row < 4; ++row) {
+		for (int col = 0; col < 4; ++col) {
+			// For column-major order, access the matrix elements in this order:
+			ss << matrix[col * 4 + row] << " ";
+		}
+		ss << std::endl; // Newline at the end of each row
+	}
+
+	std::cout << ss.str() << std::endl;
+}

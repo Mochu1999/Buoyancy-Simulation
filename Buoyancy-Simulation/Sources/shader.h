@@ -12,15 +12,15 @@ struct ShaderProgramSource {
 struct Shader {
 
 	std::string m_FilePath;
-	int m_RendererID;
-	int colorLocation;
+	unsigned int ID;
+
 
 	Shader(const std::string& filepath)
-		:m_FilePath(filepath), m_RendererID(0) { //says that we are maintaining m_FilePath only fof debugging purpouses
+		:m_FilePath(filepath), ID(0) { //says that we are maintaining m_FilePath only fof debugging purpouses
 		ShaderProgramSource source = ParseShader(filepath);
-		m_RendererID = CreateShader(source.VertexSource, source.FragmentSource);
+		ID = CreateShader(source.VertexSource, source.FragmentSource);
 
-		colorLocation = glGetUniformLocation(m_RendererID, "u_Color");
+		
 	}
 
 	ShaderProgramSource ParseShader(const string& filepath) { //Converts a .shader into 2 separate streams and each one into strings for glShaderSource in CompileShader
@@ -84,7 +84,10 @@ struct Shader {
 
 
 		unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
+		compileErrors(vs, "VERTEX SHADER");
 		unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
+		compileErrors(fs, "VERTEX SHADER");
+
 
 		//linking them:
 		glAttachShader(program, vs);
@@ -96,10 +99,10 @@ struct Shader {
 		return program;
 	}
 	~Shader() {
-		glDeleteProgram(m_RendererID);
+		glDeleteProgram(ID);
 	}
 	void Bind() const {
-		glUseProgram(m_RendererID);
+		glUseProgram(ID);
 	}
 
 	void Unbind() const {
@@ -120,7 +123,7 @@ struct Shader {
 			return m_UniformLocationCache[name];
 		*/
 		//solo estaba esto de abajo antes de unordored map
-		int location = glGetUniformLocation(m_RendererID, name.c_str()); //The location represents a handle or identifier that OpenGL uses to identify and access a specific uniform variable//Without the location, OpenGL wouldn't know which uniform variable you are referring to when you call glUniform4f
+		int location = glGetUniformLocation(ID, name.c_str()); //The location represents a handle or identifier that OpenGL uses to identify and access a specific uniform variable//Without the location, OpenGL wouldn't know which uniform variable you are referring to when you call glUniform4f
 		if (location == -1) {//if location ==-1 it means it couldn't find the uniform, it can happen if the uniform is unused//But why do I need this line?
 			std::cout << "Warning " << name << " does not exist" << std::endl;
 		}
@@ -129,62 +132,90 @@ struct Shader {
 		return location;
 	}
 
+	// Checks if the different Shaders have compiled properly
+	void compileErrors(unsigned int shader, const char* type)
+	{
+		// Stores status of compilation
+		GLint hasCompiled;
+		// Character array to store error message in
+		char infoLog[1024];
+		if (type != "PROGRAM")
+		{
+			glGetShaderiv(shader, GL_COMPILE_STATUS, &hasCompiled);
+			if (hasCompiled == GL_FALSE)
+			{
+				glGetShaderInfoLog(shader, 1024, NULL, infoLog);
+				std::cout << "SHADER_COMPILATION_ERROR for:" << type << "\n" << infoLog << std::endl;
+			}
+		}
+		else
+		{
+			glGetProgramiv(shader, GL_LINK_STATUS, &hasCompiled);
+			if (hasCompiled == GL_FALSE)
+			{
+				glGetProgramInfoLog(shader, 1024, NULL, infoLog);
+				std::cout << "SHADER_LINKING_ERROR for:" << type << "\n" << infoLog << std::endl;
+			}
+		}
+	}
 };
+
+
 
 
 GLFWwindow* initialize() {
 	glfwInit();
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	glfwWindowHint(GLFW_DEPTH_BITS, 32);
+	/*glfwWindowHint(GLFW_DEPTH_BITS, 32);
 
-	glfwWindowHint(GLFW_SAMPLES, 4);
+	glfwWindowHint(GLFW_SAMPLES, 4);*/
 	GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Buoyancy Simulation 3D", NULL, NULL);
 
-	glEnable(GL_MULTISAMPLE);
+	//glEnable(GL_MULTISAMPLE);
 
 	glfwMakeContextCurrent(window);
-	glewExperimental = GL_TRUE;
+	//glewExperimental = GL_TRUE;
 	glewInit();
 	glfwSwapInterval(1);
 
-	//depth buffering
+	////depth buffering
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-
-
-	glEnable(GL_BLEND);//blend for alpha opacity, lets blending pixels in the same position
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	//glEnable(GL_DEPTH_TEST);
 	//glDepthFunc(GL_LESS);
 
-	//// Enable polygon offset fill
-	//glEnable(GL_POLYGON_OFFSET_FILL);
-	//// Apply the offset. These values might need tweaking for your specific use case
-	//glPolygonOffset(1.0f, 1.0f);
+
+	//glEnable(GL_BLEND);//blend for alpha opacity, lets blending pixels in the same position
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	////glEnable(GL_DEPTH_TEST);
+	////glDepthFunc(GL_LESS);
+
+	////// Enable polygon offset fill
+	////glEnable(GL_POLYGON_OFFSET_FILL);
+	////// Apply the offset. These values might need tweaking for your specific use case
+	////glPolygonOffset(1.0f, 1.0f);
 
 	return window;
 }
 
-#define CHECK_GL_ERROR() {\
-    GLenum err = glGetError();\
-    while (err != GL_NO_ERROR) {\
-        std::cout << "OpenGL error: " << std::hex << err << std::dec << " line:" << __LINE__ << std::endl;\
-        err = glGetError();\
-    }\
-}
-std::set<std::string> printedErrors;
-
-void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) { //Only adds errors once
-	std::string errorMsg(message);
-
-	if (printedErrors.find(errorMsg) == printedErrors.end()) {
-		std::cerr << message << std::endl;
-
-		printedErrors.insert(errorMsg);
-	}
-}
+//#define CHECK_GL_ERROR() {\
+//    GLenum err = glGetError();\
+//    while (err != GL_NO_ERROR) {\
+//        std::cout << "OpenGL error: " << std::hex << err << std::dec << " line:" << __LINE__ << std::endl;\
+//        err = glGetError();\
+//    }\
+//}
+//std::set<std::string> printedErrors;
+//
+//void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) { //Only adds errors once
+//	std::string errorMsg(message);
+//
+//	if (printedErrors.find(errorMsg) == printedErrors.end()) {
+//		std::cerr << message << std::endl;
+//
+//		printedErrors.insert(errorMsg);
+//	}
+//}

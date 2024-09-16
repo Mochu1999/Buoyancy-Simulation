@@ -2,6 +2,8 @@
 
 #include "Common.hpp"
 
+
+
 struct Camera {
 
 	float rotationSpeed = 0.05f;
@@ -19,7 +21,7 @@ struct Camera {
 	std::array<float, 16> viewMatrix;
 	std::array<float, 16> vpMatrix;
 
-	p3 cameraPos =  { 50.0, 50.0, 50.0 };
+	p3 cameraPos =  { 50.0, 150.0, 50.0 };
 
 	//p3 forward = { 0.0f,-1.0f,0.0f }; //cuando dejó esto de funcionar?
 	p3 forward = normalize3(p3{ -0.2,-1,-0.8 });

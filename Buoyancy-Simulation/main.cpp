@@ -28,7 +28,8 @@
 #include "Spheres.hpp"
 
 #include "Delaunay_2D.hpp"
-
+#include "Arrows.hpp"
+#include "Pyramid.hpp"
 
 
 // to not render what is not visible to the camera:
@@ -92,16 +93,39 @@ int main(void)
 
 	Camera camera(window);
 
+	Pyramid pyramid;
+
+	////////////////////////////////////////////////////////////
+	Sphere sphere(50, 100);
+
+	sphere.addSet({ 00,00,00 });
+
+	//for (int i = 0; i < 1/*firstPoints.size()*/; i++)
+	//{
+	//	cout << "i: " << i << endl;
+	//	cout << "Indices: " << sphere.indices[i * 3] << ", " << sphere.indices[i * 3 + 1] << ", " << sphere.indices[i * 3 + 2] << endl;
+	//	cout << "Positions: " << endl;
+	//	printp3(sphere.positions[sphere.indices[i * 3]]);
+	//	printp3(sphere.positions[sphere.indices[i * 3 + 1]]);
+	//	printp3(sphere.positions[sphere.indices[i * 3 + 2]]);
+
+	//	cout <<endl<<endl;
+	//	printp3(sphere.normals[sphere.indices[i]]);
+
+	//}
 
 
-	Sphere sphere(20,100);
+	vector<p3> centroids;
+	for (unsigned int i = 0; i < sphere.indices.size(); i += 3)
+	{
+		centroids.push_back(
+			centroid(sphere.positions[sphere.indices[i]], sphere.positions[sphere.indices[i + 1]], sphere.positions[sphere.indices[i + 2]])
+		);
+	}
 
-	sphere.addSet({ 30,30,30 });
 
-
-
-
-
+	Arrows arrows;
+	arrows.addSet(centroids, sphere.normals);
 
 
 
@@ -131,21 +155,19 @@ int main(void)
 
 
 
-	//printvec3(test.positions);
+
+
+
+
 
 	//getPos(window);
-
 	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-
-
-
-
-	GLint locationMVP = glGetUniformLocation(shader.m_RendererID, "u_MVP");
-	GLint locationView = glGetUniformLocation(shader.m_RendererID, "u_ViewMatrix");
-	int renderTypeLocation = glGetUniformLocation(shader.m_RendererID, "u_RenderType");
-
-
+	GLint locationMVP = glGetUniformLocation(shader.ID, "u_MVP");
+	GLint locationView = glGetUniformLocation(shader.ID, "u_ViewMatrix");
+	int renderTypeLocation = glGetUniformLocation(shader.ID, "u_RenderType");
+	int colorLocation = glGetUniformLocation(shader.ID, "u_Color");
+	int cameraPosition = glGetUniformLocation(shader.ID, "camPos");
 
 
 
@@ -169,7 +191,9 @@ int main(void)
 		//system("cls");
 		if (isRunning)
 		{
+			
 
+			glClearColor(0.035f, 0.065f, 0.085f, 1.0f);
 			//polygon.translate({ 0,0.1,0 });
 			//printv3(polygon.positions);
 
@@ -177,19 +201,19 @@ int main(void)
 
 			glUniform1i(renderTypeLocation, 1);
 
-			glUniform4f(shader.colorLocation, 1.0, 1.0, 1.0, 1.0);
+			glUniform4f(colorLocation, 1.0, 1.0, 1.0, 1.0);
 			//groundLines.draw();
 
-			glUniform4f(shader.colorLocation, 1.0, 0.0, 0.0, 1.0);
+			glUniform4f(colorLocation, 1.0, 0.0, 0.0, 1.0);
 			xLine.draw();
-			glUniform4f(shader.colorLocation, 0.0, 1.0, 0.0, 1.0);
+			glUniform4f(colorLocation, 0.0, 1.0, 0.0, 1.0);
 			zLine.draw();
-			glUniform4f(shader.colorLocation, 0.0, 0.0, 1.0, 1.0);
+			glUniform4f(colorLocation, 0.0, 0.0, 1.0, 1.0);
 			yLine.draw();
 
 
 
-			glUniform4f(shader.colorLocation, 1.0, 0.0, 1.0, 1);
+			glUniform4f(colorLocation, 1.0, 0.0, 1.0, 1);
 			xLine2.draw();
 			zLine2.draw();
 			//wettedSurface.draw();
@@ -202,36 +226,38 @@ int main(void)
 			/*trLines.draw();
 			auxSquare.draw();*/
 
-			
 
-			
+
+
 
 
 
 			glUniform1i(renderTypeLocation, 0);
-
-			
-
-			glUniform4f(shader.colorLocation, 40.0f / 255.0f, 239.9f / 255.0f, 239.0f / 255.0f, 0.3f);
-			//glUniform4f(shader.colorLocation, 00.0f / 255.0f, 204.0f / 255.0f, 0.0f / 255.0f, 0.1f);
+			glUniform4f(colorLocation, 40.0f / 255.0f, 239.9f / 255.0f, 239.0f / 255.0f, 1);
+			glUniform4f(colorLocation, 255.0f / 255.0f, 255.0f / 255.0f, 255.0f / 255.0f, 1);
 			//printflat(fourier.indices);
 			//fourier.createWavePositions();
 			//fourier.draw();
-			//sphere.draw();
-
+			sphere.draw();
+			pyramid.draw();
 
 			glUniform1i(renderTypeLocation, 1);
-			glUniform4f(shader.colorLocation, 0, 0, 0.0, 1.0);
+			glUniform4f(colorLocation, 0, 0, 1.0, 1.0);
 			for (auto& line : fourier.lines)
 			{
 				//line.draw();
 			}
+			//arrows.draw();
 
-			glUniform4f(shader.colorLocation, 135.0f / 255.0f, 0.0, 0.0, 1);
-			sphere.drawLines();
+			glUniform4f(colorLocation, 187.0f / 255.0f, 165.61f / 255.0f, 61.0f / 255.0f, 1);
+
+			glUniform4f(colorLocation, 135.0f / 255.0f, 0.0, 0.0, 1);
+			//sphere.drawLines();
 			//sphere.draw();
 
 			camera.updateCamera();
+			//glUniform3f(glGetUniformLocation(shader.ID, "camPos"), camera.cameraPos.x, camera.cameraPos.y, camera.cameraPos.z);
+			glUniform3f(cameraPosition, camera.cameraPos.x, camera.cameraPos.y, camera.cameraPos.z);
 			glUniformMatrix4fv(locationMVP, 1, GL_FALSE, camera.vpMatrix.data());
 			glUniformMatrix4fv(locationView, 1, GL_FALSE, camera.viewMatrix.data());
 
@@ -247,7 +273,7 @@ int main(void)
 
 
 
-			//glUniform4f(shader.colorLocation, 1.0f, 1.0f, 1.0f, 0.4f);
+			//glUniform4f(colorLocation, 1.0f, 1.0f, 1.0f, 0.4f);
 			//groundLines.draw();//anisotropic filtering
 
 

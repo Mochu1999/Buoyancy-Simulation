@@ -122,7 +122,6 @@ struct Sphere {
 
 
 		
-		meshLines.addSet(positions,0);
 
 		meshIndices = generateMeshIndices(projectedPoints, delaunay);
 		vector<unsigned int> secondMeshIndices = generateMeshIndices(lidPoints, delaunay2);
@@ -139,6 +138,13 @@ struct Sphere {
 		indices.reserve(indices.size() + secondTrIndices.size());
 		indices.insert(indices.end(), secondTrIndices.begin(), secondTrIndices.end());
 
+
+		meshLines.addSet(positions, 0);
+		
+
+
+		
+
 	}
 
 
@@ -154,12 +160,20 @@ struct Sphere {
 		meshLines.indices = meshIndices;
 
 		calculateNormals();
+
+		indices.resize(3);
+		normals.resize(3);
+
+		/*print(positions.size());
+		print(normals.size());
+		print(indices.size()/3);*/
 	}
 
 	//las tapas van mal
 	void calculateNormals() {
 		normals.clear();
 		normals.reserve(indices.size() * inv3);
+
 
 		for (int i = 0; i < indices.size(); i += 3) 
 		{
@@ -172,6 +186,7 @@ struct Sphere {
 			}
 
 			normals.emplace_back(n);
+			normals.size();
 		}
 
 	}

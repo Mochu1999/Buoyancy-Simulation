@@ -11,12 +11,12 @@ struct ShaderProgramSource {
 
 struct Shader {
 
-	std::string m_FilePath;
+	std::string filePath;
 	unsigned int ID;
 
 
 	Shader(const std::string& filepath)
-		:m_FilePath(filepath), ID(0) { //says that we are maintaining m_FilePath only fof debugging purpouses
+		:filePath(filepath), ID(0) { //we are maintaining filePath only for debugging purpouses
 		ShaderProgramSource source = ParseShader(filepath);
 		ID = CreateShader(source.VertexSource, source.FragmentSource);
 

@@ -434,6 +434,7 @@
     <ClInclude Include="Sources\Lines3d.hpp" />
     <ClInclude Include="Sources\Polygons.hpp" />
     <ClInclude Include="Sources\Pyramid.hpp" />
+    <ClInclude Include="Sources\Settings.hpp" />
     <ClInclude Include="Sources\shader.h" />
     <ClInclude Include="Sources\Spheres.hpp" />
     <ClInclude Include="Sources\Time.hpp" />

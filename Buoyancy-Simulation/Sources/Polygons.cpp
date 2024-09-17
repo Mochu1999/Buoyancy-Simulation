@@ -64,21 +64,68 @@ Polygons::~Polygons() {
 }
 
 
+void Polygons::addSet(vector<p3> items) {
 
+	isBufferUpdated = true;
+	lines.addSet(items);
+	//model = positions;
+
+	//sweepTriangulation();
+
+
+	//areaCalculation();
+
+
+	/*if (area < 0) {
+		for (int i = 0; i < positions.size() / 2; i += 2) {
+			std::swap(positions[i], positions[positions.size() - 2 - i]);
+			std::swap(positions[i + 1], positions[positions.size() - 1 - i]);
+		}
+		areaCalculation();
+	}*/
+
+	//centroidCalculation();
+	//polarAreaMomentOfInertia();
+
+	calculateNormal();
+
+	//Rotates positions into XY positions
+	p3 zAxis(0, 0, 1);
+	p3 rotationAxis = normalize3(cross3(normal, zAxis));
+
+	float angle = acos(dot3(normal, zAxis) / (magnitude3(normal) * magnitude3(zAxis)));
+
+
+	xyPositions.clear();
+	xyPositions.reserve(positions.size());
+
+	std::array<float, 4> rotationQuaternion = createQuaternion(angle, rotationAxis);
+
+	for (int i = 0; i < positions.size(); i++)
+	{
+		xyPositions.emplace_back(rotatePoint(positions[i], rotationQuaternion));
+	}
+
+
+	sweepTriangulation();
+	calculateNormal();
+}
+
+//for 2d, project into x,y if you are in 3d
 //triangulates with a sweep algorithm from left to right. It assigns to each point an state and creates and triangulates sequentially chains
 void  Polygons::sweepTriangulation(/*int i*/) {
 	//It can produce triangles of 0 area (collinear sPoints)
 
 	isBufferUpdated = true;
 
-	std::vector<unsigned int> edges;
+	std::vector<unsigned int> edges; //edges are the farthest point of a chain (where the sweep line is)
 	std::unordered_set<int> elementsToAvoid;
-	std::vector<unsigned int> sortedIndices;
+	std::vector<unsigned int> sortedIndices; //will sort sPoints and store their ordered indices
 
-	sPoints.clear();
-	chain.clear();
-
-	indices.clear();
+	
+	sPoints.clear();//structured points, saves positions with its indices in their original order
+	chain.clear(); 
+	indices.clear(); 
 
 
 	for (unsigned int i = 0; i < xyPositions.size() - 1; i++)
@@ -90,7 +137,8 @@ void  Polygons::sweepTriangulation(/*int i*/) {
 	sortedIndices.resize(sPoints.size());
 	std::iota(sortedIndices.begin(), sortedIndices.end(), 0); //initializing it as 0,1,2,3...
 
-	//sorting sortedIndices by x //I could have only used [this] but I would be capturing the entire class
+	//sorting sortedIndices by x (and greater y if same x) 
+	//I could have used [this] but I would be capturing the entire class
 	std::sort(sortedIndices.begin(), sortedIndices.end(), [&sPoints = this->sPoints](unsigned int i1, unsigned int i2)
 		{
 			if (sPoints[i1].point.x == sPoints[i2].point.x)
@@ -99,9 +147,8 @@ void  Polygons::sweepTriangulation(/*int i*/) {
 		});
 
 
+	
 	/*printflat(sortedIndices);
-
-
 	cout << "sPoints:" << endl;
 	for (const auto& entry : sPoints) {
 		cout << entry.index << " " << entry.point.x << " " << entry.point.y<< endl;
@@ -109,15 +156,15 @@ void  Polygons::sweepTriangulation(/*int i*/) {
 
 
 
-
+	//I enter the pipeline with sPoints (original order) and sorted indices
 	for (size_t i = 0; i < sortedIndices.size(); ++i)
 	{
 		unsigned int currentIndex = sortedIndices[i]; //b[0]
 
-		if (elementsToAvoid.find(currentIndex) == elementsToAvoid.end())  //We avoid collinears
+		if (elementsToAvoid.find(currentIndex) == elementsToAvoid.end())  //We avoid "collinears", those that share the same x with out point
 		{
 
-
+			
 			int size = sPoints.size();
 
 			//b is the current point. a is the one that is before b and c the one that is after in cc
@@ -125,10 +172,10 @@ void  Polygons::sweepTriangulation(/*int i*/) {
 			StructuredPoints a;
 			StructuredPoints c;
 
-			//it stores, apart from b, the sPoints are collinear with b for the same x. All are processed at the same iteration
+			//it stores, apart from b, the sPoints that are collinear with b for the same x. All are processed at the same iteration
 			std::deque<unsigned int> bContainer;
 
-
+			//finding a
 			int bcounter = 1; //a and c will usually be 1 unit away from b but could be farther if there are more colliner sPoints
 			while (true)
 			{
@@ -146,6 +193,8 @@ void  Polygons::sweepTriangulation(/*int i*/) {
 			}
 
 			bContainer.push_back(currentIndex);
+
+			//finding c
 			bcounter = 1;
 			while (true)
 			{
@@ -161,15 +210,16 @@ void  Polygons::sweepTriangulation(/*int i*/) {
 					break;
 			}
 
-			//debug
-			/*cout << endl << "**** currentIndex = " << currentIndex << endl;
+			////debug
+			//cout << endl << "**** currentIndex = " << currentIndex << endl;
 
-			cout << "a.index: " << a.index << " c.index: " << c.index << endl;
+			//cout << "a.index: " << a.index << " c.index: " << c.index << endl;
 
-			cout << "bContainer: " << endl;
-			for (int i = 0; i < bContainer.size(); i++) {
-				cout << bContainer[i] << " ";
-			}cout << endl << endl;;*/
+			//cout << "bContainer: " << endl;
+			//for (int i = 0; i < bContainer.size(); i++) {
+			//	cout << bContainer[i] << " ";
+			//}cout << endl << endl;;
+
 
 
 			unsigned int currentChain = 0;
@@ -179,7 +229,7 @@ void  Polygons::sweepTriangulation(/*int i*/) {
 
 
 
-			//START, a and c are after b
+			//START case, a and c are after b (in the x sweep)
 			// Proper if the new pair of edges is above or bellow other edges, improper if it is in between a pair (breaks that pair)
 			if (a.point.x > b.point.x && c.point.x > b.point.x)
 			{
@@ -527,48 +577,7 @@ void Polygons::trChainFront(const unsigned int& currentChain) {
 //
 //}
 
-void Polygons::addSet(vector<p3> items) {
 
-	isBufferUpdated = true;
-	lines.addSet(items);
-	//model = positions;
-
-	//sweepTriangulation();
-
-
-	//areaCalculation();
-
-
-	/*if (area < 0) {
-		for (int i = 0; i < positions.size() / 2; i += 2) {
-			std::swap(positions[i], positions[positions.size() - 2 - i]);
-			std::swap(positions[i + 1], positions[positions.size() - 1 - i]);
-		}
-		areaCalculation();
-	}*/
-
-	//centroidCalculation();
-	//polarAreaMomentOfInertia();
-
-	calculateNormal();
-
-	p3 zAxis(0, 0, 1);
-	p3 rotationAxis = normalize3(cross3(normal, zAxis));
-
-	float angle = acos(dot3(normal, zAxis) / (magnitude3(normal) * magnitude3(zAxis)));
-
-	xyPositions.clear();
-	xyPositions.reserve(positions.size());
-
-	std::array<float, 4> rotationQuaternion = createQuaternion(angle, rotationAxis);
-
-	for (int i = 0; i < positions.size(); i++)
-	{
-		xyPositions.emplace_back(rotatePoint(positions[i], rotationQuaternion));
-	}
-	sweepTriangulation();
-	calculateNormal();
-}
 
 
 void Polygons::clear() {

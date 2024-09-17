@@ -6,7 +6,8 @@
 
 
 
-//esto va a tener toda la funcionalidad. Si no la quieres cambiale el nombre a physicsPolygon y crea otra con menos cosas
+//maybe remove some functionality and put it in elsewhere
+
 struct Polygons {
 	GLenum usageHint = GL_DYNAMIC_DRAW;
 
@@ -16,8 +17,8 @@ struct Polygons {
 
 	//vector<p3> model;
 	vector<p3>& positions = lines.positions;
-	vector <unsigned int> indices; //triangle indices, do not mistake with the lines indices
-	vector<p3> xyPositions;
+	vector <unsigned int> indices; //triangle indices, do not mistake them with the lines indices
+	vector<p3> xyPositions; //the variable is rotated in addSet so the z value is equal for every point
 
 	unsigned int vertexBuffer;
 	unsigned int vertexArray;
@@ -74,7 +75,7 @@ struct Polygons {
 
 	void clear();
 
-	//a ver, addSet lleva dentro sweeptriangulation, pero sweep triangulation no me funciona, yo que sé, voy a crear uno para las esferas y te dejo a ti enterarte de que lo que
+
 
 	
 

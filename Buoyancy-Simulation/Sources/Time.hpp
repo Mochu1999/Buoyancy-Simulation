@@ -26,7 +26,7 @@ struct TimeCounter {
 
 
 
-struct TimeData {
+struct TimeStruct {
     std::chrono::high_resolution_clock::time_point lastFrameTime;
     std::chrono::high_resolution_clock::time_point startElapsedTime;
 
@@ -35,7 +35,8 @@ struct TimeData {
     float frameCount = 0.0f;
     float timeAccumulator = 0.0f;
     float deltaTime = 0.0f;
-    TimeData() {
+
+    TimeStruct() {
         lastFrameTime = std::chrono::high_resolution_clock::now();
         startElapsedTime = lastFrameTime;
     }

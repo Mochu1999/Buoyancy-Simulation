@@ -29,8 +29,13 @@ using namespace std;
 #include <functional>
 #include <random>
 
-//not templated definitions of functions need to be separated from their declarations
+//not templated definitions of functions need to be separated from their declarations in .cpp
 
+// Constants
+constexpr double PI = 3.14159265358979323846;
+constexpr double halfPI = PI / 2;
+constexpr float inv3 = 1.0f / 3;
+//global variables are after vec3
 
 template<typename T>
 struct vec2 {
@@ -124,14 +129,14 @@ struct p_HashMultiplicative {
 };
 
 struct pair_hash_multiplicative {
-    std::size_t operator()(const std::pair<p, p>& edge) const {
-        p_HashMultiplicative ph;
-        std::size_t h1 = ph(edge.first);
-        std::size_t h2 = ph(edge.second);
+	std::size_t operator()(const std::pair<p, p>& edge) const {
+		p_HashMultiplicative ph;
+		std::size_t h1 = ph(edge.first);
+		std::size_t h2 = ph(edge.second);
 
-        // Combine the two hashes
-        return h1 ^ (h2 * 0x9e3779b97f4a7c15ULL); // Using another large constant
-    }
+		// Combine the two hashes
+		return h1 ^ (h2 * 0x9e3779b97f4a7c15ULL); // Using another large constant
+	}
 };
 
 //sum of products, is also equal to v1*v2*cos(theta)
@@ -219,7 +224,7 @@ using p3 = vec3<float>;
 using ui3 = vec3<unsigned int>;
 
 
-//these must be out of vec3 be accesible without the need of calling them like variable.cross()
+//these must be out of vec3 to be accesible without the need of calling them like variable.cross()
 
 //sum of products
 template<typename T>
@@ -240,12 +245,12 @@ float fastInverseSqrt(float number);
 
 template<typename T>
 vec3<T> normalize3(const vec3<T>& v) {
-    T magnitudeSquared = v.x * v.x + v.y * v.y + v.z * v.z;
-    if (magnitudeSquared == 0.0f) {
-        return vec3<T>(0, 0, 0); // Return a zero vector to avoid division by zero
-    }
-    float magnitude_inv = fastInverseSqrt(magnitudeSquared);
-    return vec3<T>(v.x * magnitude_inv, v.y * magnitude_inv, v.z * magnitude_inv);
+	T magnitudeSquared = v.x * v.x + v.y * v.y + v.z * v.z;
+	if (magnitudeSquared == 0.0f) {
+		return vec3<T>(0, 0, 0); // Return a zero vector to avoid division by zero
+	}
+	float magnitude_inv = fastInverseSqrt(magnitudeSquared);
+	return vec3<T>(v.x * magnitude_inv, v.y * magnitude_inv, v.z * magnitude_inv);
 }
 
 template<typename T>
@@ -259,44 +264,50 @@ float magnitude3(const vec3<T>& v) {
 
 
 
+
+
 // Declarations of global variables
 extern p cursor;
 extern float windowHeight;
 extern float windowWidth;
 extern bool isRunning;
-inline vector<p3> model;// = { {25,0,25},{25 + 20,0,25} ,{25 + 20,20,25} ,{25,20,25},{25,0,25} };
+inline vector<p3> model;
 
-// Constants
-constexpr double PI = 3.14159265358979323846;
-constexpr double halfPI = PI/2;
-constexpr float inv3 = 1.0f / 3;
+
+
+
+
+
 
 
 
 void getCursorPos(GLFWwindow* window);
 
-#define print(var) print_without_macro(#var, var)
-template<typename T>
-void print_without_macro(const string& name, const T& item) {
-	stringstream ss;
-	cout << name << ": " << item << endl;
-}
 
-#define printp(var) printp_without_macro(#var, var)
+// General print template for all types
 template<typename T>
-void printp_without_macro(const string& name, const T& items) {
+void print_(const string& name, const T& item) {
 	stringstream ss;
-	ss << name << endl;
-	ss << "{" << items.x << "," << items.y << "}";
-
+	ss << name << ": " << item;
 	cout << ss.str() << endl << endl;
 }
 
-#define printv2(var) printv2_without_macro(#var, var)
+// Overload for vec2<T>
 template<typename T>
-void printv2_without_macro(const string& name, const vector<vec2<T>>& items) {
+void print_(const string& name, const vec2<T>& items) {
 	stringstream ss;
-	ss << name << endl;
+	ss << name << ": ";
+	ss << "{" << items.x << "," << items.y << "}";
+	cout << ss.str() << endl << endl;
+}
+
+
+
+//vector<vec2<T>>
+template<typename T>
+void print_(const string& name, const vector<vec2<T>>& items) {
+	stringstream ss;
+	ss << name << ": {";
 	for (size_t i = 0; i < items.size(); ++i) {
 		ss << "{" << items[i].x << "," << items[i].y << "}";
 
@@ -304,15 +315,25 @@ void printv2_without_macro(const string& name, const vector<vec2<T>>& items) {
 			ss << ",";
 		}
 	}
+	cout << ss.str() << "}" << endl << endl;
+}
+
+//vec3<T>
+template<typename T>
+void print_(const string& name, const vec3<T>& items) {
+	stringstream ss;
+	ss << name << ": ";
+	ss << "{" << items.x << "," << items.y << "," << items.z << "}";
+
 	cout << ss.str() << endl << endl;
 }
 
-//print vector of p3
-#define printv3(var) printv3_without_macro(#var, var)
+
+//vector<vec3<T>>
 template<typename T>
-void printv3_without_macro(const string& name, const vector<vec3<T>>& items) {
+void print_(const string& name, const vector<vec3<T>>& items) {
 	stringstream ss;
-	ss << name << endl;
+	ss << name << ": {";
 	for (size_t i = 0; i < items.size(); ++i) {
 		ss << "{" << items[i].x << "," << items[i].y << "," << items[i].z << "}";
 
@@ -320,14 +341,14 @@ void printv3_without_macro(const string& name, const vector<vec3<T>>& items) {
 			ss << ",";
 		}
 	}
-	cout << ss.str() << endl << endl;
+	cout << ss.str() << "}" << endl << endl;
 }
 
-#define printflat(var) printflat_without_macro(#var, var)
+//vector<T>
 template<typename T>
-void printflat_without_macro(const string& name, const vector<T>& items) {
+void print_(const string& name, const vector<T>& items) {
 	stringstream ss;
-	ss << name << endl;
+	ss << name << ": ";
 	ss << "{";
 	for (size_t i = 0; i < items.size(); i++) {
 		ss << items[i];
@@ -340,15 +361,8 @@ void printflat_without_macro(const string& name, const vector<T>& items) {
 	cout << ss.str() << endl << endl;
 }
 
-#define printp3(var) printp3_without_macro(#var, var)
-template<typename T>
-void printp3_without_macro(const string& name, const T& items) {
-	stringstream ss;
-	ss << name << endl;
-	ss << "{" << items.x << "," << items.y << "," << items.z << "}";
+#define print(var) print_(#var, var)
 
-	cout << ss.str() << endl << endl;
-}
 
 #define printm16(var) printm16_without_macro(#var, var)
 
@@ -358,7 +372,7 @@ void printm16_without_macro(const std::string& name, const std::array<float, 16>
 
 
 
-//Que hace esto?
+//Borrar
 //aun con p chatgpt sigue diciendo que referencia podría no ser lo mejor. También sigue diciendo que un valor positivo es que p2 está a la derecha
 template<typename T>
 float crossProduct(const vec2<T>& p0, const vec2<T>& p1, const vec2<T>& p2) {
@@ -397,7 +411,7 @@ float isBelowTriangle(const p3& a, const p3& b, const p3& c, const p3& p);
 
 template<typename T>
 vec3<T> centroid(const vec3<T>& p1, const vec3<T>& p2, const vec3<T>& p3) {
-	return (p1 + p2 + p3)*inv3;
+	return (p1 + p2 + p3) * inv3;
 }
 
 template<typename T>

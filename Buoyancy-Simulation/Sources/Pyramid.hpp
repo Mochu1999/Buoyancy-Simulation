@@ -102,7 +102,7 @@ struct Pyramid {
 			p *= 100;
 			p += p3{ 100,0,100 };
 		}
-		printv3(positions);
+		//printv3(positions);
 		calculateNormals();
 		genBuffers();
 	}

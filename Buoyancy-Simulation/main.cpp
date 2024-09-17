@@ -37,6 +37,9 @@
 //glCullFace(GL_BACK);          // Cull back faces
 //glFrontFace(GL_CCW);          // Counter-clockwise winding is front-facing
 
+
+
+
 using namespace std::chrono;
 
 float xpos, ypos;
@@ -96,36 +99,21 @@ int main(void)
 	Pyramid pyramid;
 
 	////////////////////////////////////////////////////////////
-	Sphere sphere(50, 100);
+	//Sphere sphere(50, 100);
 
-	sphere.addSet({ 00,00,00 });
+	//sphere.addSet({ 00,00,00 });
 
-	//for (int i = 0; i < 1/*firstPoints.size()*/; i++)
+	//vector<p3> centroids;
+	//for (unsigned int i = 0; i < sphere.indices.size(); i += 3)
 	//{
-	//	cout << "i: " << i << endl;
-	//	cout << "Indices: " << sphere.indices[i * 3] << ", " << sphere.indices[i * 3 + 1] << ", " << sphere.indices[i * 3 + 2] << endl;
-	//	cout << "Positions: " << endl;
-	//	printp3(sphere.positions[sphere.indices[i * 3]]);
-	//	printp3(sphere.positions[sphere.indices[i * 3 + 1]]);
-	//	printp3(sphere.positions[sphere.indices[i * 3 + 2]]);
-
-	//	cout <<endl<<endl;
-	//	printp3(sphere.normals[sphere.indices[i]]);
-
+	//	centroids.push_back(
+	//		centroid(sphere.positions[sphere.indices[i]], sphere.positions[sphere.indices[i + 1]], sphere.positions[sphere.indices[i + 2]])
+	//	);
 	//}
+	//Arrows arrows;
+	//arrows.addSet(centroids, sphere.normals);
 
 
-	vector<p3> centroids;
-	for (unsigned int i = 0; i < sphere.indices.size(); i += 3)
-	{
-		centroids.push_back(
-			centroid(sphere.positions[sphere.indices[i]], sphere.positions[sphere.indices[i + 1]], sphere.positions[sphere.indices[i + 2]])
-		);
-	}
-
-
-	Arrows arrows;
-	arrows.addSet(centroids, sphere.normals);
 
 
 
@@ -147,8 +135,8 @@ int main(void)
 
 
 
-	Fourier fourier;
-	fourier.updateWavePositions();
+	//Fourier fourier;
+	//fourier.updateWavePositions();
 
 	//WettedSurface wettedSurface(polygon,fourier);
 
@@ -188,6 +176,7 @@ int main(void)
 
 	while (!glfwWindowShouldClose(window))
 	{
+		break;
 		//system("cls");
 		if (isRunning)
 		{
@@ -207,9 +196,9 @@ int main(void)
 			glUniform4f(colorLocation, 1.0, 0.0, 0.0, 1.0);
 			xLine.draw();
 			glUniform4f(colorLocation, 0.0, 1.0, 0.0, 1.0);
-			zLine.draw();
-			glUniform4f(colorLocation, 0.0, 0.0, 1.0, 1.0);
 			yLine.draw();
+			glUniform4f(colorLocation, 0.0, 0.0, 1.0, 1.0);
+			zLine.draw();
 
 
 
@@ -217,7 +206,7 @@ int main(void)
 			xLine2.draw();
 			zLine2.draw();
 			//wettedSurface.draw();
-			//polygon.draw();
+			polygon.draw();
 			//line.draw();
 
 			//triangles.lines.draw();
@@ -238,15 +227,15 @@ int main(void)
 			//printflat(fourier.indices);
 			//fourier.createWavePositions();
 			//fourier.draw();
-			sphere.draw();
-			pyramid.draw();
+			//sphere.draw();
+			//pyramid.draw();
 
 			glUniform1i(renderTypeLocation, 1);
 			glUniform4f(colorLocation, 0, 0, 1.0, 1.0);
-			for (auto& line : fourier.lines)
-			{
-				//line.draw();
-			}
+			//for (auto& line : fourier.lines)
+			//{
+			//	line.draw();
+			//}
 			//arrows.draw();
 
 			glUniform4f(colorLocation, 187.0f / 255.0f, 165.61f / 255.0f, 61.0f / 255.0f, 1);

@@ -87,9 +87,10 @@ struct Sphere {
 	bool isBufferUpdated = false;
 	GLenum usageHint = GL_DYNAMIC_DRAW;
 
-	Sphere(float radius_, unsigned int n_ = std::numeric_limits<unsigned int>::max()) : radius(radius_) {
+	Sphere(float radius_, unsigned int n_ = std::numeric_limits<unsigned int>::max()): radius(radius_) {
 		genBuffers();
 
+		//assigning n if not specified
 		if (n_ != std::numeric_limits<unsigned int>::max())
 			n = n_;
 		else
@@ -143,7 +144,8 @@ struct Sphere {
 		
 
 
-		
+		//////////////////
+		addSet({ 0,0,0 });
 
 	}
 
@@ -161,12 +163,23 @@ struct Sphere {
 
 		calculateNormals();
 
-		indices.resize(3);
-		normals.resize(3);
 
-		/*print(positions.size());
-		print(normals.size());
-		print(indices.size()/3);*/
+
+		//print(positions.size());
+		//print(normals.size());
+		//print(indices.size()/3);
+
+		//print(positions);
+		////print(normals);
+		//print(indices);
+	}
+
+	void reorderPositions() {
+		vector<p3> interm;
+		for (auto& i : indices)
+		{
+			interm.push_back(positions[i]);
+		}
 	}
 
 	//las tapas van mal

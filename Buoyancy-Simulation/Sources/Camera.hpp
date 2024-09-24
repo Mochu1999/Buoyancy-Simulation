@@ -21,7 +21,7 @@ struct Camera {
 	std::array<float, 16> viewMatrix;
 	std::array<float, 16> vpMatrix;
 
-	p3 cameraPos = { 34.2925,140.692,144.102 };
+	p3 cameraPos;
 
 	//p3 forward = { 0.0f,-1.0f,0.0f }; //cuando dejó esto de funcionar?
 	p3 forward = normalize3(p3{ 0.148691,-0.742031,-0.651083 });

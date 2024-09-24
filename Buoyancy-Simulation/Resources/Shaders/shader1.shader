@@ -68,7 +68,7 @@ out vec4 FragColor;
 in vec3 Normal;
 in vec3 crntPos;
 
-
+//flat in vec3 Normal;  // Ensure you use flat shading for normals
 
 vec4 lightColor = vec4(1.0, 1.0, 1.0, 1.0);
 vec3 lightPos = vec3(25,50,25);
@@ -98,7 +98,7 @@ void main()
 		float specular = specAmount * specularLight;
 
 		// outputs final color
-		FragColor =  objectColor * lightColor * (diffuse + ambient+specular);
+		FragColor =  objectColor * lightColor * (diffuse + ambient + specular);
 	}
 	if (u_RenderType == 1) 
     {

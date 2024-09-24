@@ -31,6 +31,7 @@
 #include "Arrows.hpp"
 #include "Pyramid.hpp"
 
+#include "Settings.hpp"
 
 // to not render what is not visible to the camera:
 //glEnable(GL_CULL_FACE);       // Enable face culling
@@ -80,7 +81,7 @@ int main(void)
 
 	/*glDebugMessageCallback(MessageCallback, nullptr);
 	glEnable(GL_DEBUG_OUTPUT);*/
-
+	
 
 	BinariesManager binariesManager;
 
@@ -96,22 +97,26 @@ int main(void)
 
 	Camera camera(window);
 
+	
+	Settings settings(camera);
+	
+
 	Pyramid pyramid;
 
 	////////////////////////////////////////////////////////////
-	//Sphere sphere(50, 100);
+	Sphere sphere(50, 10);
 
 	//sphere.addSet({ 00,00,00 });
 
-	//vector<p3> centroids;
-	//for (unsigned int i = 0; i < sphere.indices.size(); i += 3)
-	//{
-	//	centroids.push_back(
-	//		centroid(sphere.positions[sphere.indices[i]], sphere.positions[sphere.indices[i + 1]], sphere.positions[sphere.indices[i + 2]])
-	//	);
-	//}
-	//Arrows arrows;
-	//arrows.addSet(centroids, sphere.normals);
+	vector<p3> centroids;
+	for (unsigned int i = 0; i < sphere.indices.size(); i += 3)
+	{
+		centroids.push_back(
+			centroid(sphere.positions[sphere.indices[i]], sphere.positions[sphere.indices[i + 1]], sphere.positions[sphere.indices[i + 2]])
+		);
+	}
+	Arrows arrows;
+	arrows.addSet(centroids, sphere.normals);
 
 
 
@@ -176,7 +181,6 @@ int main(void)
 
 	while (!glfwWindowShouldClose(window))
 	{
-		break;
 		//system("cls");
 		if (isRunning)
 		{
@@ -206,7 +210,7 @@ int main(void)
 			xLine2.draw();
 			zLine2.draw();
 			//wettedSurface.draw();
-			polygon.draw();
+			//polygon.draw();
 			//line.draw();
 
 			//triangles.lines.draw();
@@ -227,8 +231,8 @@ int main(void)
 			//printflat(fourier.indices);
 			//fourier.createWavePositions();
 			//fourier.draw();
-			//sphere.draw();
-			//pyramid.draw();
+			sphere.draw();
+			pyramid.draw();
 
 			glUniform1i(renderTypeLocation, 1);
 			glUniform4f(colorLocation, 0, 0, 1.0, 1.0);
@@ -236,12 +240,13 @@ int main(void)
 			//{
 			//	line.draw();
 			//}
-			//arrows.draw();
+			glUniform4f(colorLocation, 1, 0, 0, 1.0);
+			arrows.draw();
 
 			glUniform4f(colorLocation, 187.0f / 255.0f, 165.61f / 255.0f, 61.0f / 255.0f, 1);
 
 			glUniform4f(colorLocation, 135.0f / 255.0f, 0.0, 0.0, 1);
-			//sphere.drawLines();
+			sphere.drawLines();
 			//sphere.draw();
 
 			camera.updateCamera();
@@ -267,9 +272,10 @@ int main(void)
 
 
 
-
+			//break;
 		}
 		//isRunning = false;
+		settings.write();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

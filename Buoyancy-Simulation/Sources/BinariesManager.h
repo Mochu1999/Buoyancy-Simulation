@@ -27,7 +27,7 @@ struct BinariesManager {
 }
 cout << "MODELPATH " << modelPath << endl;*/
 
-	std::string basePath = "Resources/3D models/";
+	std::string basePath = "Resources/";
 
 	enum programType { CAD, RUNNING };
 
@@ -44,7 +44,7 @@ cout << "MODELPATH " << modelPath << endl;*/
 	}
 
 
-	
+
 	void writeConfig() {
 		system("cls");
 
@@ -136,7 +136,7 @@ cout << "MODELPATH " << modelPath << endl;*/
 				outFile.write(reinterpret_cast<const char*>(&currentProgramType), sizeof(currentProgramType));
 			}
 			outFile.close();
-			
+
 		}
 
 
@@ -163,7 +163,7 @@ cout << "MODELPATH " << modelPath << endl;*/
 			modelPath.resize(indexEntries[1].size);
 
 			if (inFileConfig.read(&modelPath[0], modelPath.size())) {
-				std::cout << endl << "modelPath: " << modelPath << std::endl << std::endl;
+				//std::cout << endl << "modelPath: " << modelPath << std::endl << std::endl;
 			}
 
 		}
@@ -202,7 +202,7 @@ cout << "MODELPATH " << modelPath << endl;*/
 
 	void readModel()
 	{
-		
+
 		std::string path = basePath + modelPath;
 
 		//reads the 2 elements that we set in writeModel

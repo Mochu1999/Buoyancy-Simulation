@@ -405,6 +405,13 @@ std::array<float, 4> multiplyQuaternions(const std::array<float, 4>& a, const st
 // q * p * q^-1
 p3 rotatePoint(const p3& point, const std::array<float, 4>& rotationQuaternion);
 
+void rotate3D(std::vector<p3>& vertices, float angleX, float angleY, float angleZ);
+
+template<typename T>
+T radians(T input){
+	return input * PI / 180.0f;
+}
+
 float isBelowTriangle(const p3& a, const p3& b, const p3& c, const p3& p);
 
 

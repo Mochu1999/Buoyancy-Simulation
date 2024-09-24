@@ -103,22 +103,19 @@ int main(void)
 
 	Pyramid pyramid;
 
+	Sphere light(3);
+	light.addSet({ 30,50,25 });
+
 	////////////////////////////////////////////////////////////
-	Sphere sphere(50, 10);
+	Sphere sphere(40, 1000);
 
-	//sphere.addSet({ 00,00,00 });
+	sphere.addSet({ 00,00,00 });
 
-	vector<p3> centroids;
-	for (unsigned int i = 0; i < sphere.indices.size(); i += 3)
-	{
-		centroids.push_back(
-			centroid(sphere.positions[sphere.indices[i]], sphere.positions[sphere.indices[i + 1]], sphere.positions[sphere.indices[i + 2]])
-		);
-	}
 	Arrows arrows;
-	arrows.addSet(centroids, sphere.normals);
+	arrows.addSet(sphere.positions, sphere.normals);
 
-
+	Arrows arrows2;
+	arrows2.addSet(pyramid.positions, pyramid.normals);
 
 
 
@@ -241,12 +238,15 @@ int main(void)
 			//	line.draw();
 			//}
 			glUniform4f(colorLocation, 1, 0, 0, 1.0);
-			arrows.draw();
+			//arrows.draw();
+			arrows2.draw();
+			glUniform4f(colorLocation, 1, 1, 1, 1.0);
+			light.draw();
 
 			glUniform4f(colorLocation, 187.0f / 255.0f, 165.61f / 255.0f, 61.0f / 255.0f, 1);
 
 			glUniform4f(colorLocation, 135.0f / 255.0f, 0.0, 0.0, 1);
-			sphere.drawLines();
+			//sphere.drawLines();
 			//sphere.draw();
 
 			camera.updateCamera();

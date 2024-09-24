@@ -73,6 +73,22 @@ p3 rotatePoint(const p3& point, const std::array<float, 4>& rotationQuaternion) 
 	return p3(rotatedPointQuat[1], rotatedPointQuat[2], rotatedPointQuat[3]);
 }
 
+
+void rotate3D(std::vector<p3>& vertices, float angleX, float angleY, float angleZ) {
+	// Create rotation quaternions for each axis
+	std::array<float, 4> qX = createQuaternion(radians(angleX), p3(1, 0, 0)); // Rotation around X-axis
+	std::array<float, 4> qY = createQuaternion(radians(angleY), p3(0, 1, 0)); // Rotation around Y-axis
+	std::array<float, 4> qZ = createQuaternion(radians(angleZ), p3(0, 0, 1)); // Rotation around Z-axis
+
+	// Combine the quaternions (Z * Y * X)
+	std::array<float, 4> combinedQuat = multiplyQuaternions(multiplyQuaternions(qZ, qY), qX);
+
+	// Rotate each vertex
+	for (p3& vertex : vertices) {
+		vertex = rotatePoint(vertex, combinedQuat);
+	}
+}
+
 float isBelowTriangle(const p3& a, const p3& b, const p3& c, const p3& p) {
 
 	//equivalent to the signed volume of a tetrahedron without the /6.0f

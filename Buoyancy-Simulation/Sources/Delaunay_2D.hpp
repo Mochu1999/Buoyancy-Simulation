@@ -116,7 +116,7 @@ Triangle createSuperTriangle(const std::vector<p>& points) {
 	return Triangle(v1, v2, v3);
 }
 
-//Solo para esferas, en el futuro mete un condicional si no necesitas lidIndices
+
 //Triangulates the 2d points. If it's a sphere lidIndices are stored to retriangulate later
 //It iterates through the points only once. First it creates a super triangle that englobes every point.
 //The delaunay triangulation works by every triangle not having in its circumcircle any other point, so for every 
@@ -131,6 +131,7 @@ std::vector<Triangle> bowyerWatson(std::vector<p>& points, std::vector<unsigned 
     std::vector<Triangle> triangles;
     triangles.reserve(2 * points.size()); //there's a theorem that says that it will be close but less than 2
 
+	//we start with only one triangle, which will get into badTriangles and separated in each for iteration
     triangles.push_back(superTriangle);
 
 
@@ -139,7 +140,7 @@ std::vector<Triangle> bowyerWatson(std::vector<p>& points, std::vector<unsigned 
 		std::vector<Triangle> badTriangles;
 		badTriangles.reserve(20);
 
-		// Use partition instead of erase-insert. It reorders triangles and returns an iterator where triangles end and badTriangles start.
+		// Using partition instead of erase-insert. It reorders triangles and returns an iterator where triangles end and badTriangles start.
 		// The reorder works by positioning first those triangles that do not circumcircle other points
 		std::vector<Triangle>::iterator partitionIt = std::partition(triangles.begin(), triangles.end(),
 			[&point](const Triangle& t) { return !t.circumcircleContains(point); });
@@ -150,17 +151,17 @@ std::vector<Triangle> bowyerWatson(std::vector<p>& points, std::vector<unsigned 
 		
 		std::unordered_set<std::pair<p, p>, pair_hash_multiplicative> edgeSet;
 		//the logic literally is, if the edge of the badTriangle is only found once, then it is an outer polygon edge. If it is found 
-		// twice (it's shared between 2 badTriangles),then it's removed, It is as simple as that. Using for faster deletions
+		// twice (it's shared between 2 badTriangles),then it's removed, It is as simple as that. Using set for faster deletions
 		for (const Triangle& t : badTriangles)
 		{
 			std::pair<p, p> edges[3] = { {t.p1, t.p2}, {t.p2, t.p3}, {t.p3, t.p1} };
 
 			for (const auto& edge : edges)
 			{
-				// Normalize the edge so (p1, p2) and (p2, p1) are treated as the same. Reorder by the arbithatry smaller edge.first going first
+				// Normalize the edge so (p1, p2) and (p2, p1) are treated as the same. Reorders by the arbithatry "smaller edge.first going first"
 				std::pair<p, p> normalizedEdge = edge.first < edge.second ? edge : std::pair<p, p>(edge.second, edge.first);
 
-				//this is a structured binding, inserted is a boolean that returns true if the element is inserted
+				//this is a structured binding, inserted is a boolean that returns true if the element is already inserted (deleting the pair)
 				auto [it, inserted] = edgeSet.insert(normalizedEdge);
 				if (!inserted) 
 				{
@@ -364,3 +365,102 @@ vector<p3> p2ToP3(const vector<p>& input) {
 	return output;
 
 }
+
+
+//std::vector<Triangle> bowyerWatson(std::vector<p>& points, std::vector<unsigned int>& lidIndices) {
+//
+//	Triangle superTriangle = createSuperTriangle(points);
+//
+//	std::vector<Triangle> triangles;
+//	triangles.reserve(2 * points.size()); //there's a theorem that says that it will be close but less than 2
+//
+//	triangles.push_back(superTriangle);
+//
+//
+//	for (const p& point : points)
+//	{
+//		std::vector<Triangle> badTriangles;
+//		badTriangles.reserve(20);
+//
+//		// Using partition instead of erase-insert. It reorders triangles and returns an iterator where triangles end and badTriangles start.
+//		// The reorder works by positioning first those triangles that do not circumcircle other points
+//		std::vector<Triangle>::iterator partitionIt = std::partition(triangles.begin(), triangles.end(),
+//			[&point](const Triangle& t) { return !t.circumcircleContains(point); });
+//
+//		badTriangles.insert(badTriangles.end(), partitionIt, triangles.end());
+//		triangles.erase(partitionIt, triangles.end());
+//
+//
+//		std::unordered_set<std::pair<p, p>, pair_hash_multiplicative> edgeSet;
+//		//the logic literally is, if the edge of the badTriangle is only found once, then it is an outer polygon edge. If it is found 
+//		// twice (it's shared between 2 badTriangles),then it's removed, It is as simple as that. Using for faster deletions
+//		for (const Triangle& t : badTriangles)
+//		{
+//			std::pair<p, p> edges[3] = { {t.p1, t.p2}, {t.p2, t.p3}, {t.p3, t.p1} };
+//
+//			for (const auto& edge : edges)
+//			{
+//				// Normalize the edge so (p1, p2) and (p2, p1) are treated as the same. Reorder by the arbithatry smaller edge.first going first
+//				std::pair<p, p> normalizedEdge = edge.first < edge.second ? edge : std::pair<p, p>(edge.second, edge.first);
+//
+//				//this is a structured binding, inserted is a boolean that returns true if the element is inserted
+//				auto [it, inserted] = edgeSet.insert(normalizedEdge);
+//				if (!inserted)
+//				{
+//					edgeSet.erase(it);
+//				}
+//			}
+//		}
+//
+//		//Now we add the new triangles
+//		triangles.reserve(triangles.size() + edgeSet.size());
+//
+//		for (const auto& edge : edgeSet)
+//		{
+//			triangles.emplace_back(point, edge.first, edge.second);
+//		}
+//	}
+//
+//	//this is only useful for the sphere
+//	std::vector<p> lidPoints;
+//	std::unordered_set<p, p_HashMultiplicative> uniqueLidPoints;
+//
+//	// Gathers vertices that are connected to supertriangle without being its edges
+//	for (const auto& t : triangles)
+//	{
+//		if (t == superTriangle)
+//		{
+//			if (!(t.p1 == superTriangle.p1 || t.p1 == superTriangle.p2 || t.p1 == superTriangle.p3)) uniqueLidPoints.insert(t.p1);
+//			if (!(t.p2 == superTriangle.p1 || t.p2 == superTriangle.p2 || t.p2 == superTriangle.p3)) uniqueLidPoints.insert(t.p2);
+//			if (!(t.p3 == superTriangle.p1 || t.p3 == superTriangle.p2 || t.p3 == superTriangle.p3)) uniqueLidPoints.insert(t.p3);
+//		}
+//	}
+//
+//	// Convert set to vector
+//	lidPoints.assign(uniqueLidPoints.begin(), uniqueLidPoints.end());
+//
+//
+//	//Now that we have the points, we retrieve the lid indices looking for in points
+//	//It looks inefficient but 
+//	for (unsigned int i = 0; i < points.size(); ++i)
+//	{
+//		for (const auto& lid : lidPoints)
+//		{
+//			if (lid == points[i])
+//			{
+//				lidIndices.push_back(i);
+//				break;
+//			}
+//		}
+//	}
+//
+//
+//	triangles.erase(std::remove_if(triangles.begin(), triangles.end(),
+//		[&superTriangle](const Triangle& t) {
+//			return t == superTriangle;  // Checks if any vertex matches any in superTriangle
+//		}), triangles.end());
+//
+//	return triangles;
+//
+//
+//}

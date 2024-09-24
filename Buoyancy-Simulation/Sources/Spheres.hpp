@@ -59,6 +59,7 @@ std::vector<p> stereographicProjection(const std::vector<p3>& positions) {
 
 //If you want to draw the mesh lines instead of the triangles, it is currently using Lines3d for it
 struct Sphere {
+	p3 center;
 	float radius;
 	unsigned int n;
 
@@ -131,8 +132,8 @@ struct Sphere {
 		meshLines.indices = meshIndices;
 
 		
-
-
+		
+		vector<unsigned int> intermi;
 
 		indices = generateTrIndices(projectedPoints, delaunay);
 		vector<unsigned int> secondTrIndices = generateTrIndices(lidPoints, delaunay2);
@@ -142,19 +143,22 @@ struct Sphere {
 
 		meshLines.addSet(positions, 0);
 		
+		
+		//generatePositionsAndIndices(intermi);
 
+		
+		
 
-		//////////////////
-		addSet({ 0,0,0 });
 
 	}
 
 
 
-	void addSet(p3 location) {
+	void addSet(p3 center_) {
+		center = center_;
 		for (auto& pos : positions)
 		{
-			pos += location;
+			pos += center;
 		}
 		isBufferUpdated = true;
 
@@ -165,25 +169,20 @@ struct Sphere {
 
 
 
-		//print(positions.size());
-		//print(normals.size());
-		//print(indices.size()/3);
+		print(positions.size());
+		print(indices.size() / 3);
+		print(normals.size());
+		print(positions);
+		print(indices);
+		print(normals);
 
-		//print(positions);
-		////print(normals);
-		//print(indices);
+		
 	}
 
-	void reorderPositions() {
-		vector<p3> interm;
-		for (auto& i : indices)
-		{
-			interm.push_back(positions[i]);
-		}
-	}
+	
 
-	//las tapas van mal
-	void calculateNormals() {
+	
+	/*void calculateNormals() {
 		normals.clear();
 		normals.reserve(indices.size() * inv3);
 
@@ -199,12 +198,69 @@ struct Sphere {
 			}
 
 			normals.emplace_back(n);
-			normals.size();
+
 		}
 
+	}*/
+	//void calculateNormals() {
+	//	normals.clear();
+	//	normals.resize(positions.size(), { 0,0,0 });
+
+	//	for (int i = 0; i < indices.size(); i += 3) {
+	//		vec3<float> pos1 = positions[indices[i]];
+	//		vec3<float> pos2 = positions[indices[i + 1]];
+	//		vec3<float> pos3 = positions[indices[i + 2]];
+
+	//		// Calculate normal
+	//		vec3<float> normal = normalize3(cross3(pos2 - pos1, pos3 - pos1));
+
+	//		// Check if the normal is facing the wrong direction
+	//		if (dot3(normal, pos1) < 0) {
+	//			// Swap pos2 and pos3 to correct the winding order
+	//			std::swap(pos2, pos3);
+
+	//			// Recalculate normal after swap
+	//			normal = normalize3(cross3(pos2 - pos1, pos3 - pos1));
+	//		}
+
+	//		// Assign normals to the corresponding vertices
+	//		normals[indices[i]] = normal;
+	//		normals[indices[i + 1]] = normal;
+	//		normals[indices[i + 2]] = normal;
+	//	}
+
+	//	// Normalize all normals
+	//	for (vec3<float>& normal : normals) {
+	//		normal = normalize3(normal);
+	//	}
+	//}
+	void calculateNormals() {
+		normals.clear();
+		
+
+		for (auto& pos : positions) 
+		{
+			normals.push_back(normalize3(pos - center));
+		}
 	}
+
 	void drawLines() {
 		meshLines.draw();
+	}
+	void generatePositionsAndIndices(std::vector<unsigned int>& intermi) {
+		vector<p3> interm;
+		indices.clear();
+		int counter = 0;
+		for (const auto& i : intermi) 
+		{
+			interm.push_back(positions[i]);
+
+			
+			indices.push_back(counter);
+			counter++;
+			
+		}
+		positions = interm;
 	}
 
 	void draw() {

@@ -2,25 +2,19 @@
 #include"Common.hpp"
 
 
-
+//This file is here to test illumination. Here you will find sharp illumination, where you need to repeat positions if you want to have different normals per vertex.
+//If you don't repeat positions you can only have one normal per vertex (soft illumination)
 struct Pyramid {
 
+	//vertex data is unique for each face (repeated positions) 
+	vector<p3> positions = { {50,0,150},{50,0,50},{150,0,50},{50,0,150},{150,0,50},{150,0,150}
+		,{50,0,150},{100,80,100},{50,0,50},{50,0,50},{100,80,100},{150,0,50},{150,0,50}
+	,{100,80,100},{150,0,150},{150,0,150},{100,80,100},{50,0,150} };
 
-	vector<p3> positions = { {50,0,150},{50,0,50},{150,0,50},{150,0,150}
-	,{50,0,150},{50,0,50},{100,80,100},{50,0,50},{150,0,50},{100,80,100}
-	,{150,0,50},{150,0,150},{100,80,100},{150,0,150},{50,0,150},{100,80,100} };
+	vector<unsigned int> indices;
 
-	vector<unsigned int> indices =
-	{
-		0, 1, 2, // Bottom side
-		0, 2, 3, // Bottom side
-		4, 6, 5, // Left side
-		7, 9, 8, // Non-facing side
-		10, 12, 11, // Right side
-		13, 15, 14 // Facing side
-	};
-	
 	void reorder() {
+		//why the hell didn't I use sets here
 		vector<p3> interm;
 		bool isInside;
 		for (auto& i : positions)
@@ -37,7 +31,7 @@ struct Pyramid {
 			if (!isInside)
 				interm.push_back(i);
 		}
-		
+
 		vector<unsigned int> intermi;
 
 		for (auto& i : indices)
@@ -51,12 +45,12 @@ struct Pyramid {
 				}
 			}
 		}
-		
+
 
 		positions.clear(); indices.clear();
 		positions = interm; indices = intermi;
 	}
-	
+
 	vector<p3> normals;
 	bool isBufferUpdated = true;
 
@@ -77,19 +71,20 @@ struct Pyramid {
 
 	GLenum usageHint = GL_STATIC_DRAW;
 
+	//vertex data must be unique for each face (repeated positions)
 	void calculateNormals1() {
 		normals.clear();
 		normals.resize(positions.size(), { 0,0,0 });
 
 		for (int i = 0; i < indices.size(); i += 3) {
-			p3 pos1 = positions[indices[i]];
-			p3 pos2 = positions[indices[i + 1]];
-			p3 pos3 = positions[indices[i + 2]];
+			vec3<float> pos1 = positions[indices[i]];
+			vec3<float> pos2 = positions[indices[i + 1]];
+			vec3<float> pos3 = positions[indices[i + 2]];
 
-			p3 normal = normalize3(cross3(pos2 - pos1, pos3 - pos1));
+			vec3<float> normal = normalize3(cross3(pos2 - pos1, pos3 - pos1));
 
 			normals[indices[i]] = normal;
-			normals[indices[i + 1]] =normal;
+			normals[indices[i + 1]] = normal;
 			normals[indices[i + 2]] = normal;
 		}
 
@@ -99,8 +94,7 @@ struct Pyramid {
 		}
 	}
 
-	//Averaged normals. 
-	//stores normals for each triangle face, then summing them for each vertex
+	//normal averaging for shared vertices (unrepeated positions)
 	void calculateNormals2() {
 		normals.clear();
 		normals.resize(positions.size(), { 0, 0, 0 });
@@ -123,21 +117,32 @@ struct Pyramid {
 			normal = normalize3(normal);
 		}
 	}
-
+	
+	void generateIndices() {
+		indices.clear();
+		for (int i = 0; i < positions.size(); i++)
+		{
+			indices.push_back(i);
+		}
+	}
 
 	Pyramid() {
-		reorder();
-		calculateNormals2();
-		
-		//calculateNormals1();
+		//rotate3D(positions, 0, 0, 0);
 
-		print(positions.size());
-		print(indices.size()/3);
+		genBuffers();
+		generateIndices();
+
+		//reorder();
+		//calculateNormals2();
+
+		calculateNormals1();
+
+		/*print(positions.size());
+		print(indices.size() / 3);
 		print(normals.size());
 		print(positions);
 		print(indices);
-		print(normals);
-		genBuffers();
+		print(normals);*/
 	}
 
 
@@ -213,5 +218,64 @@ struct Pyramid {
 		glDeleteVertexArrays(1, &vertexArray);
 		glDeleteBuffers(1, &vertexBuffer);
 		glDeleteBuffers(1, &indexBuffer);
+	}
+
+
+	//not tested, to have sharp edges
+	void calculateNormalsWithSharpEdges(float sharpAngleDegrees) {
+		normals.clear();
+		normals.resize(positions.size(), { 0, 0, 0 });
+
+		// Pre-calculate all face normals
+		std::vector<vec3<float>> faceNormals(indices.size() / 3);
+
+		for (int i = 0; i < indices.size(); i += 3) {
+			vec3<float> pos1 = positions[indices[i]];
+			vec3<float> pos2 = positions[indices[i + 1]];
+			vec3<float> pos3 = positions[indices[i + 2]];
+
+			vec3<float> faceNormal = normalize3(cross3(pos2 - pos1, pos3 - pos1));
+			faceNormals[i / 3] = faceNormal;
+		}
+
+		// Accumulate normals for each vertex but only if faces are smooth enough
+		float cosSharpAngleThreshold = cos(sharpAngleDegrees * PI / 180.0f); // Convert degrees to radians
+
+		for (int i = 0; i < indices.size(); i += 3) {
+			int idx1 = indices[i];
+			int idx2 = indices[i + 1];
+			int idx3 = indices[i + 2];
+
+			vec3<float> faceNormal = faceNormals[i / 3];
+
+			// For each edge, compare the normals of adjacent faces
+			addNormalIfSmooth(idx1, idx2, faceNormal, faceNormals, cosSharpAngleThreshold);
+			addNormalIfSmooth(idx2, idx3, faceNormal, faceNormals, cosSharpAngleThreshold);
+			addNormalIfSmooth(idx3, idx1, faceNormal, faceNormals, cosSharpAngleThreshold);
+		}
+
+		// Normalize the accumulated normals
+		for (vec3<float>& normal : normals) {
+			normal = normalize3(normal);
+		}
+	}
+
+	// Helper function to accumulate normal for a vertex if the adjacent face normals are smooth
+	void addNormalIfSmooth(int vertexIndex1, int vertexIndex2, vec3<float>& faceNormal,
+		const std::vector<vec3<float>>& faceNormals, float cosThreshold) {
+		for (int i = 0; i < indices.size(); i += 3) {
+			// Check if vertexIndex1 and vertexIndex2 belong to another face
+			if ((indices[i] == vertexIndex1 && indices[i + 1] == vertexIndex2) ||
+				(indices[i] == vertexIndex2 && indices[i + 1] == vertexIndex1) ||
+				(indices[i] == vertexIndex1 && indices[i + 2] == vertexIndex2) ||
+				(indices[i] == vertexIndex2 && indices[i + 2] == vertexIndex1)) {
+
+				vec3<float> adjacentNormal = faceNormals[i / 3];
+				if (dot3(faceNormal, adjacentNormal) >= cosThreshold) {
+					normals[vertexIndex1] += faceNormal;
+					normals[vertexIndex2] += faceNormal;
+				}
+			}
+		}
 	}
 };

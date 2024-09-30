@@ -30,7 +30,7 @@
 #include "Delaunay_2D.hpp"
 #include "Arrows.hpp"
 #include "Pyramid.hpp"
-
+#include "Model.hpp"
 #include "Settings.hpp"
 
 // to not render what is not visible to the camera:
@@ -77,15 +77,33 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
 int main(void)
 {
+
 	GLFWwindow* window = initialize();
 
 	/*glDebugMessageCallback(MessageCallback, nullptr);
 	glEnable(GL_DEBUG_OUTPUT);*/
+
+
+	//BinariesManager binariesManager;
+
 	
 
-	BinariesManager binariesManager;
 
-	model = { {25,0,25},{45,0,25} ,{45,20,25},{35,30,25} ,{25,20,25},{25,0,25} };
+	//writeModel(model);
+	model = readModel("new.bin");
+	Polygons polygon;
+	polygon.addSet(model);
+
+
+	print(polygon.positions);
+	//print(polygon.indices);
+
+
+
+
+	Sphere auxSphere(1);
+	auxSphere.addSet(polygon.centroid);
+
 	//printv3(model);
 
 	Auxiliary_Elements groundLines;
@@ -97,25 +115,24 @@ int main(void)
 
 	Camera camera(window);
 
-	
+
 	Settings settings(camera);
-	
+
 
 	Pyramid pyramid;
 
-	Sphere light(3);
-	light.addSet({ 30,50,25 });
+	Sphere light(3, 80);
+	p3 lightPos = { 30,50,25 };
+	light.addSet(lightPos);
 
-	////////////////////////////////////////////////////////////
-	Sphere sphere(40, 1000);
 
-	sphere.addSet({ 00,00,00 });
+	Sphere sphere(40, 500);
+	sphere.addSet({ 00,00,-100 });
 
-	Arrows arrows;
-	arrows.addSet(sphere.positions, sphere.normals);
 
-	Arrows arrows2;
-	arrows2.addSet(pyramid.positions, pyramid.normals);
+	/*Arrows arrows;
+	arrows.addSet(sphere.positions, sphere.normals);*/
+
 
 
 
@@ -130,8 +147,10 @@ int main(void)
 	Lines3d zLine2;
 	zLine2.addSet({ {0,0,0},{0,0,5} });
 
-	Polygons polygon;
-	polygon.addSet(model);
+
+
+
+
 
 
 
@@ -153,13 +172,15 @@ int main(void)
 	//getPos(window);
 	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-	GLint locationMVP = glGetUniformLocation(shader.ID, "u_MVP");
-	GLint locationView = glGetUniformLocation(shader.ID, "u_ViewMatrix");
+	int locationMVP = glGetUniformLocation(shader.ID, "u_MVP");
+	int locationView = glGetUniformLocation(shader.ID, "u_ViewMatrix");
+	int locationLightPos = glGetUniformLocation(shader.ID, "u_lightPos");
 	int renderTypeLocation = glGetUniformLocation(shader.ID, "u_RenderType");
 	int colorLocation = glGetUniformLocation(shader.ID, "u_Color");
 	int cameraPosition = glGetUniformLocation(shader.ID, "camPos");
 
-
+	glUniform3f(locationLightPos, lightPos.x, lightPos.y, lightPos.z);
+	glUniform4f(glGetUniformLocation(shader.ID, "u_Color"), 0, 1, 0, 1);
 
 
 
@@ -168,7 +189,6 @@ int main(void)
 
 
 	int counter = 0;
-
 
 
 
@@ -181,9 +201,9 @@ int main(void)
 		//system("cls");
 		if (isRunning)
 		{
-			
 
 			glClearColor(0.035f, 0.065f, 0.085f, 1.0f);
+			//glClearColor(1, 1, 1, 1.0f);
 			//polygon.translate({ 0,0.1,0 });
 			//printv3(polygon.positions);
 
@@ -207,7 +227,7 @@ int main(void)
 			xLine2.draw();
 			zLine2.draw();
 			//wettedSurface.draw();
-			//polygon.draw();
+
 			//line.draw();
 
 			//triangles.lines.draw();
@@ -224,12 +244,16 @@ int main(void)
 
 			glUniform1i(renderTypeLocation, 0);
 			glUniform4f(colorLocation, 40.0f / 255.0f, 239.9f / 255.0f, 239.0f / 255.0f, 1);
+			sphere.draw();
 			glUniform4f(colorLocation, 255.0f / 255.0f, 255.0f / 255.0f, 255.0f / 255.0f, 1);
 			//printflat(fourier.indices);
 			//fourier.createWavePositions();
 			//fourier.draw();
-			sphere.draw();
+			glUniform4f(colorLocation, 187.0f / 255.0f, 165.61f / 255.0f, 61.0f / 255.0f, 1);
 			pyramid.draw();
+			glUniform4f(colorLocation, 135.0f / 255.0f, 0.0, 0.0, 1);
+			glUniform4f(colorLocation, 255/ 255.0f, 0.0, 0.0, 1);
+			polygon.draw();
 
 			glUniform1i(renderTypeLocation, 1);
 			glUniform4f(colorLocation, 0, 0, 1.0, 1.0);
@@ -239,13 +263,14 @@ int main(void)
 			//}
 			glUniform4f(colorLocation, 1, 0, 0, 1.0);
 			//arrows.draw();
-			arrows2.draw();
+
 			glUniform4f(colorLocation, 1, 1, 1, 1.0);
 			light.draw();
+			auxSphere.draw();
+			polygon.lines.draw();
 
-			glUniform4f(colorLocation, 187.0f / 255.0f, 165.61f / 255.0f, 61.0f / 255.0f, 1);
 
-			glUniform4f(colorLocation, 135.0f / 255.0f, 0.0, 0.0, 1);
+
 			//sphere.drawLines();
 			//sphere.draw();
 

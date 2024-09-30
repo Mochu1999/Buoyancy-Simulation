@@ -52,6 +52,7 @@ std::array<float, 4> inverseQuaternion(const std::array<float, 4>& q) {
 	return { q[0], -q[1], -q[2], -q[3] }; // q^-1 = [w, -x, -y, -z] for a unit quaternion
 }
 
+//Quaternion multiplication is non-commutative (order matters)
 std::array<float, 4> multiplyQuaternions(const std::array<float, 4>& a, const std::array<float, 4>& b) {
 	std::array<float, 4> result;
 	result[0] = a[0] * b[0] - a[1] * b[1] - a[2] * b[2] - a[3] * b[3]; // w
@@ -62,8 +63,9 @@ std::array<float, 4> multiplyQuaternions(const std::array<float, 4>& a, const st
 }
 
 // q * p * q^-1
-p3 rotatePoint(const p3& point, const std::array<float, 4>& rotationQuaternion) {
-
+p3 rotatePoint(const p3& point, const float& angle, const p3& axis) {
+	std::array<float, 4> rotationQuaternion = createQuaternion(angle, axis);
+	//p
 	std::array<float, 4> pointQuat = { 0, point.x, point.y, point.z };
 	std::array<float, 4> inverseQuat = inverseQuaternion(rotationQuaternion);
 
@@ -74,20 +76,31 @@ p3 rotatePoint(const p3& point, const std::array<float, 4>& rotationQuaternion) 
 }
 
 
-void rotate3D(std::vector<p3>& vertices, float angleX, float angleY, float angleZ) {
-	// Create rotation quaternions for each axis
-	std::array<float, 4> qX = createQuaternion(radians(angleX), p3(1, 0, 0)); // Rotation around X-axis
-	std::array<float, 4> qY = createQuaternion(radians(angleY), p3(0, 1, 0)); // Rotation around Y-axis
-	std::array<float, 4> qZ = createQuaternion(radians(angleZ), p3(0, 0, 1)); // Rotation around Z-axis
+void rotate3D(std::vector<p3>& vertices, const p3& centroid, float angleX, float angleY, float angleZ) {
 
-	// Combine the quaternions (Z * Y * X)
-	std::array<float, 4> combinedQuat = multiplyQuaternions(multiplyQuaternions(qZ, qY), qX);
-
-	// Rotate each vertex
-	for (p3& vertex : vertices) {
-		vertex = rotatePoint(vertex, combinedQuat);
+	for (p3& vertex : vertices) 
+	{
+		vertex -= centroid;
+		vertex = rotatePoint(vertex, radians(angleX), { 1, 0, 0 });
+		vertex = rotatePoint(vertex, radians(angleY), { 0, 1, 0 });
+		vertex = rotatePoint(vertex, radians(angleZ), { 0, 0, 1 });
+		vertex += centroid;
 	}
+
 }
+
+void rotate3D(std::vector<p3>& vertices, float angleX, float angleY, float angleZ) {
+
+	for (p3& vertex : vertices)
+	{
+		vertex = rotatePoint(vertex, radians(angleX), { 1, 0, 0 });
+		vertex = rotatePoint(vertex, radians(angleY), { 0, 1, 0 });
+		vertex = rotatePoint(vertex, radians(angleZ), { 0, 0, 1 });
+	}
+
+}
+
+
 
 float isBelowTriangle(const p3& a, const p3& b, const p3& c, const p3& p) {
 

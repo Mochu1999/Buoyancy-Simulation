@@ -432,11 +432,14 @@
     <ClInclude Include="Sources\glm\vector_relational.hpp" />
     <ClInclude Include="Sources\KeyMouseImputs.hpp" />
     <ClInclude Include="Sources\Lines3d.hpp" />
+    <ClInclude Include="Sources\Model.hpp" />
     <ClInclude Include="Sources\Polygons.hpp" />
+    <ClInclude Include="Sources\Polyhedra.hpp" />
     <ClInclude Include="Sources\Pyramid.hpp" />
     <ClInclude Include="Sources\Settings.hpp" />
     <ClInclude Include="Sources\shader.h" />
     <ClInclude Include="Sources\Spheres.hpp" />
+    <ClInclude Include="Sources\SweepTriangulation.hpp" />
     <ClInclude Include="Sources\Time.hpp" />
     <ClInclude Include="Sources\WettedSurface.hpp" />
   </ItemGroup>

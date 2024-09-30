@@ -72,8 +72,8 @@ void Polygons::addSet(vector<p3> items) {
 
 	//sweepTriangulation();
 
-
-	//areaCalculation();
+	calculateNormal();
+	calculateArea();
 
 
 	/*if (area < 0) {
@@ -84,31 +84,32 @@ void Polygons::addSet(vector<p3> items) {
 		areaCalculation();
 	}*/
 
-	//centroidCalculation();
+	centroidCalculation();
 	//polarAreaMomentOfInertia();
 
-	calculateNormal();
+	print(area);
+	print(centroid);
+	
+	xyPositions = positions;
 
-	//Rotates positions into XY positions
-	p3 zAxis(0, 0, 1);
-	p3 rotationAxis = normalize3(cross3(normal, zAxis));
+	//The objective is to set in xyPositions with the faces rotated to allign with the normal {0,0,1}
+	
+	//Finds the rotation axis
+	p3 rotationAxis = cross3(normal, { 0,0,1 });
+	//Finds the angle of rotation (dot/magnitude)
+	float angle = acos(dot3(normal, { 0,0,1 }) / (magnitude3(normal) * magnitude3(p3{ 0,0,1 }))); // angle in radians
 
-	float angle = acos(dot3(normal, zAxis) / (magnitude3(normal) * magnitude3(zAxis)));
 
-
-	xyPositions.clear();
-	xyPositions.reserve(positions.size());
-
-	std::array<float, 4> rotationQuaternion = createQuaternion(angle, rotationAxis);
-
-	for (int i = 0; i < positions.size(); i++)
+	for (auto& pos : xyPositions)
 	{
-		xyPositions.emplace_back(rotatePoint(positions[i], rotationQuaternion));
+		pos -= centroid;
+		pos = rotatePoint(pos, angle, rotationAxis);
+		pos += centroid;
 	}
 
 
 	sweepTriangulation();
-	calculateNormal();
+	//calculateNormal();
 }
 
 //for 2d, project into x,y if you are in 3d

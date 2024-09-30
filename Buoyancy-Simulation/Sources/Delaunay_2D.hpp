@@ -316,7 +316,7 @@ std::vector<unsigned int> generateMeshIndices(std::vector<p>& points, std::vecto
 
 	return indices;
 }
-
+//inserts the positions into a map, then locates quickly the indices of the triangle
 std::vector<unsigned int> generateTrIndices(std::vector<p>& points, std::vector<Triangle>& triangles) {
 	std::vector<unsigned int> indices;
 	std::unordered_map<p, unsigned int, p_HashMultiplicative> umap;

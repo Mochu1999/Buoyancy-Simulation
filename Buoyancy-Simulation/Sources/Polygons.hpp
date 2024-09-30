@@ -6,7 +6,7 @@
 
 
 
-//maybe remove some functionality and put it in elsewhere
+//maybe remove some functionality of triangulation on its own .hpp
 
 struct Polygons {
 	GLenum usageHint = GL_DYNAMIC_DRAW;
@@ -18,6 +18,7 @@ struct Polygons {
 	//vector<p3> model;
 	vector<p3>& positions = lines.positions;
 	vector <unsigned int> indices; //triangle indices, do not mistake them with the lines indices
+	//METER COMO VARIABLE RELATIVA EN ADDSET
 	vector<p3> xyPositions; //the variable is rotated in addSet so the z value is equal for every point
 
 	unsigned int vertexBuffer;
@@ -49,7 +50,8 @@ struct Polygons {
 	std::vector<std::deque<unsigned int>> chain;
 	std::vector<StructuredPoints> sPoints;
 
-
+	float area = 0.0f;
+	p3 centroid;
 
 
 	Polygons() {
@@ -71,6 +73,7 @@ struct Polygons {
 		}
 	}
 
+	
 
 
 	void clear();
@@ -98,4 +101,51 @@ struct Polygons {
 		isBufferUpdated = true;
 	}
 	
+	void calculateArea() {
+		area = 0.0;
+
+		p3 normalSum = { 0, 0, 0 }; // Accumulator for cross products
+
+		
+		for (int i = 0; i < positions.size() - 1; ++i)
+		{
+			// Compute the cross product of consecutive edges and add to normalSum
+			normalSum += cross3(positions[i], positions[i + 1]);  // Assuming cross3 returns a p3
+		}
+
+		// Compute area as half the magnitude of the accumulated cross products
+		area = 0.5 * magnitude3(normalSum);  // Assuming magnitude3 returns a float
+	}
+
+	void centroidCalculation() {
+		if (area == 0) {
+			centroid = positions[0];
+			return;
+		}
+
+		centroid = { 0, 0, 0 }; // Initialize 3D centroid
+
+		for (int i = 0; i < positions.size() - 1; i++) {
+			// Calculate the cross product of consecutive edges to get the area contribution in 3D
+			p3 v1 = positions[i];
+			p3 v2 = positions[i + 1];
+			p3 crossProduct = {
+				v1.y * v2.z - v1.z * v2.y,
+				v1.z * v2.x - v1.x * v2.z,
+				v1.x * v2.y - v1.y * v2.x
+			};
+
+			// Use the area contribution (crossProduct) to accumulate centroid coordinates
+			float factor = (v1.x * v2.y - v2.x * v1.y);
+
+			centroid.x += (v1.x + v2.x) * factor;
+			centroid.y += (v1.y + v2.y) * factor;
+			centroid.z += (v1.z + v2.z) * factor;
+		}
+
+		// Scale by the total area
+		centroid.x *= (1 / (6.0 * area));
+		centroid.y *= (1 / (6.0 * area));
+		centroid.z *= (1 / (6.0 * area));
+	}
 };

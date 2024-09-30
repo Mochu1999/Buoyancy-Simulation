@@ -3,8 +3,6 @@
 #include <filesystem>
 namespace fs = std::filesystem;
 
-#include "Common.hpp"
-
 
 
 struct BinariesManager {
@@ -24,27 +22,28 @@ struct BinariesManager {
 		std::cout << "ModelPath, ";
 	}
 	std::cout << "Offset: " << entry.offset << ", Size: " << entry.size << std::endl;
-}
-cout << "MODELPATH " << modelPath << endl;*/
+	}
+	cout << "MODELPATH " << modelPath << endl;*/
 
 	std::string basePath = "Resources/";
 
 	enum programType { CAD, RUNNING };
 
 	//these two are read from config
+	//programType currentProgramType = RUNNING;
+	//std::string modelPath = "1-goliath.bin";
 	programType currentProgramType;
 	std::string modelPath;
 
 	IndexEntry indexEntries[2];
 	BinariesManager() {
-		//writeModel();
+
 		//writeConfig();
 		readConfig();
-		readModel();
 	}
 
 
-
+	//si cierras writeConfig sin terminar el proceso config desaparece, mira a ver
 	void writeConfig() {
 		system("cls");
 
@@ -163,7 +162,7 @@ cout << "MODELPATH " << modelPath << endl;*/
 			modelPath.resize(indexEntries[1].size);
 
 			if (inFileConfig.read(&modelPath[0], modelPath.size())) {
-				//std::cout << endl << "modelPath: " << modelPath << std::endl << std::endl;
+				std::cout << endl << "modelPath: " << modelPath << std::endl << std::endl;
 			}
 
 		}
@@ -175,48 +174,43 @@ cout << "MODELPATH " << modelPath << endl;*/
 
 	}
 
-	void writeModel() {
-		cout << "save you model, currently there are these files:" << endl;
+	void writeModel(std::vector<float> model) {
+		cout << "save you model, currently if the file the are these ones:" << endl;
 		for (const auto& entry : fs::directory_iterator(basePath)) {
 			std::cout << "     " << entry.path().filename() << std::endl;
 		}
-
 		std::cin >> modelPath;
-
 		std::string path = basePath + modelPath;
-
 		cout << "setting model in: " << path << endl;
 
-		//writing the file, it will write 2 separate elements, the size and the data
 		std::ofstream outFile(path, std::ios::binary);
 		if (outFile)
 		{
 			size_t size = model.size();
-			//Writing the size. Necessary for the reading
 			outFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
-			//Writing the actual data
-			outFile.write(reinterpret_cast<const char*>(model.data()), size * sizeof(p3));
+			outFile.write(reinterpret_cast<const char*>(model.data()), size * sizeof(int));
 		}
 		outFile.close();
+
 	}
 
-	void readModel()
+	std::vector<float> readModel()
 	{
-
+		std::vector<float> model;
 		std::string path = basePath + modelPath;
 
-		//reads the 2 elements that we set in writeModel
 		std::ifstream inFile(path, std::ios::binary);
+
 		if (inFile)
 		{
-			//appends the size to this variable, then the data to model
 			size_t size;
 			inFile.read(reinterpret_cast<char*>(&size), sizeof(size));
 			model.resize(size);
-			inFile.read(reinterpret_cast<char*>(model.data()), size * sizeof(p3));
-			//printv3(model);
+			inFile.read(reinterpret_cast<char*>(model.data()), size * sizeof(int));
+
 		}
 		inFile.close();
 
+		return model;
 	}
 };

@@ -50,18 +50,9 @@ std::array<float, 16> Camera::createViewMatrix(const p3& right, const p3& up, p3
 }
 
 void Camera::calculateForward(p3& forward, const float rotationSpeed, const p3& rotationAxis) {
-	std::array<float, 4> q, q_inv, p, interm1, interm2;
 	p3 intermForward;
 
-	q = createQuaternion(rotationSpeed, rotationAxis);
-
-	q_inv = inverseQuaternion(q);
-	p = { 0, forward.x, forward.y, forward.z };
-
-	interm1 = multiplyQuaternions(q, p);
-	interm2 = multiplyQuaternions(interm1, q_inv);
-
-	intermForward = normalize3(p3{ interm2[1], interm2[2], interm2[3] });
+	intermForward = normalize3(rotatePoint(forward, rotationSpeed, rotationAxis));
 
 	if (abs(intermForward.y) < 0.99)
 		forward = intermForward;

@@ -37,13 +37,13 @@ in vec3 crntPos;
 //flat in vec3 Normal;  // Ensure you use flat shading for normals
 
 vec4 lightColor = vec4(1.0, 1.0, 1.0, 1.0);
-vec3 lightPos = vec3(30,50,25);
 
 uniform int u_RenderType;
 uniform vec3 camPos;
-uniform vec4 u_Color;
+uniform vec3 u_lightPos;
 
-vec4 objectColor = vec4(0.0f,0.0f,1.0f,1.0f);
+
+uniform vec4 u_Color;
 
 void main()
 {
@@ -54,7 +54,7 @@ void main()
 
 		// diffuse lighting
 		vec3 normal = normalize(Normal);
-		vec3 lightDirection = normalize(lightPos - crntPos);
+		vec3 lightDirection = normalize(u_lightPos - crntPos);
 		float diffuse = max(dot(normal, lightDirection), 0.0f);
 
 		// specular lighting
@@ -64,7 +64,7 @@ void main()
 		float specular = specAmount * specularLight*1.2;
 
 		// outputs final color
-		FragColor =  objectColor * lightColor * (diffuse + ambient + specular);
+		FragColor =  u_Color * lightColor * (diffuse + ambient + specular);
 	}
 	if (u_RenderType == 1) 
     {

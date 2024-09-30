@@ -34,7 +34,11 @@ using namespace std;
 // Constants
 constexpr double PI = 3.14159265358979323846;
 constexpr double halfPI = PI / 2;
-constexpr float inv3 = 1.0f / 3;
+constexpr double invPI = 1.0f/PI;
+
+constexpr float inv3 = 1.0f / 3.0f;
+constexpr float inv180 = 1.0f / 180.0f;
+
 //global variables are after vec3
 
 template<typename T>
@@ -383,7 +387,15 @@ float crossProduct(const vec2<T>& p0, const vec2<T>& p1, const vec2<T>& p2) {
 }
 
 
+template<typename T>
+T radians(T input) {
+	return input * PI * inv180;
+}
 
+template<typename T>
+T degrees(T input) {
+	return input * 180 / invPI;
+}
 
 
 
@@ -403,14 +415,15 @@ std::array<float, 4> inverseQuaternion(const std::array<float, 4>& q);
 std::array<float, 4> multiplyQuaternions(const std::array<float, 4>& a, const std::array<float, 4>& b);
 
 // q * p * q^-1
-p3 rotatePoint(const p3& point, const std::array<float, 4>& rotationQuaternion);
+p3 rotatePoint(const p3& point,const float& angle, const p3& axis);
+
+void rotate3D(std::vector<p3>& vertices, const p3& centroid, float angleX, float angleY, float angleZ);
 
 void rotate3D(std::vector<p3>& vertices, float angleX, float angleY, float angleZ);
 
-template<typename T>
-T radians(T input){
-	return input * PI / 180.0f;
-}
+
+
+
 
 float isBelowTriangle(const p3& a, const p3& b, const p3& c, const p3& p);
 

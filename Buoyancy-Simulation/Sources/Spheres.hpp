@@ -63,13 +63,12 @@ struct Sphere {
 	float radius;
 	unsigned int n;
 
-	Lines3d meshLines;
 
-	vector<p3> positions;
+	vector<p3> positions, model;
 	vector<p3> normals;
 
 	vector<unsigned int> indices;
-	vector<unsigned int> meshIndices;
+
 
 	unsigned int vertexBuffer;
 	unsigned int vertexArray;
@@ -88,7 +87,7 @@ struct Sphere {
 	bool isBufferUpdated = false;
 	GLenum usageHint = GL_DYNAMIC_DRAW;
 
-	Sphere(float radius_, unsigned int n_ = std::numeric_limits<unsigned int>::max()): radius(radius_) {
+	Sphere(float radius_, unsigned int n_ = std::numeric_limits<unsigned int>::max()) : radius(radius_) {
 		genBuffers();
 
 		//assigning n if not specified
@@ -99,16 +98,16 @@ struct Sphere {
 			n = unsigned int(pow(radius, 2.5));
 			n = std::clamp(n, 400u, 10000u);
 		}
-		
-
-		positions = addFibSphere(n, radius);
 
 
+		model = addFibSphere(n, radius);
 
-		std::vector<p> projectedPoints = stereographicProjection(positions);
 
 
-		vector<unsigned int> lidIndices;
+		std::vector<p> projectedPoints = stereographicProjection(model);
+
+
+		vector<unsigned int> lidIndices; //need to output the indices for the lid for the second iteration
 		vector<Triangle> delaunay = bowyerWatson(projectedPoints, lidIndices);
 
 
@@ -117,23 +116,13 @@ struct Sphere {
 		for (const auto& i : lidIndices)
 		{
 			//already projected
-			lidPoints.push_back(p{ positions[i].x,positions[i].z });
+			lidPoints.push_back(p{ model[i].x,model[i].z });
 
 		}
 		vector<Triangle> delaunay2 = bowyerWatson(lidPoints);
 
 
-		
 
-		meshIndices = generateMeshIndices(projectedPoints, delaunay);
-		vector<unsigned int> secondMeshIndices = generateMeshIndices(lidPoints, delaunay2);
-		indices.reserve(indices.size() + secondMeshIndices.size());
-		meshIndices.insert(meshIndices.end(), secondMeshIndices.begin(), secondMeshIndices.end());
-		meshLines.indices = meshIndices;
-
-		
-		
-		vector<unsigned int> intermi;
 
 		indices = generateTrIndices(projectedPoints, delaunay);
 		vector<unsigned int> secondTrIndices = generateTrIndices(lidPoints, delaunay2);
@@ -141,127 +130,47 @@ struct Sphere {
 		indices.insert(indices.end(), secondTrIndices.begin(), secondTrIndices.end());
 
 
-		meshLines.addSet(positions, 0);
-		
-		
-		//generatePositionsAndIndices(intermi);
-
-		
-		
-
 
 	}
 
 
-
+	//able to be dynamic
 	void addSet(p3 center_) {
+		positions.clear();
 		center = center_;
-		for (auto& pos : positions)
+		positions.resize(model.size(), center);
+		for (int i = 0; i < model.size(); i++)
 		{
-			pos += center;
+			positions[i] += model[i];
 		}
 		isBufferUpdated = true;
 
-		meshLines.addSet(positions);
-		meshLines.indices = meshIndices;
 
 		calculateNormals();
 
 
 
-		print(positions.size());
+		/*print(positions.size());
 		print(indices.size() / 3);
 		print(normals.size());
 		print(positions);
 		print(indices);
-		print(normals);
+		print(normals);*/
 
-		
+
 	}
 
-	
-
-	
-	/*void calculateNormals() {
-		normals.clear();
-		normals.reserve(indices.size() * inv3);
-
-
-		for (int i = 0; i < indices.size(); i += 3) 
-		{
-			p3 n = normal(positions[indices[i]], positions[indices[i + 1]], positions[indices[i + 2]]);
-
-			if (dot3(n, positions[indices[i]]) < 0)
-			{
-				std::swap(indices[i + 1], indices[i + 2]);
-				n = normal(positions[indices[i]], positions[indices[i + 1]], positions[indices[i + 2]]);
-			}
-
-			normals.emplace_back(n);
-
-		}
-
-	}*/
-	//void calculateNormals() {
-	//	normals.clear();
-	//	normals.resize(positions.size(), { 0,0,0 });
-
-	//	for (int i = 0; i < indices.size(); i += 3) {
-	//		vec3<float> pos1 = positions[indices[i]];
-	//		vec3<float> pos2 = positions[indices[i + 1]];
-	//		vec3<float> pos3 = positions[indices[i + 2]];
-
-	//		// Calculate normal
-	//		vec3<float> normal = normalize3(cross3(pos2 - pos1, pos3 - pos1));
-
-	//		// Check if the normal is facing the wrong direction
-	//		if (dot3(normal, pos1) < 0) {
-	//			// Swap pos2 and pos3 to correct the winding order
-	//			std::swap(pos2, pos3);
-
-	//			// Recalculate normal after swap
-	//			normal = normalize3(cross3(pos2 - pos1, pos3 - pos1));
-	//		}
-
-	//		// Assign normals to the corresponding vertices
-	//		normals[indices[i]] = normal;
-	//		normals[indices[i + 1]] = normal;
-	//		normals[indices[i + 2]] = normal;
-	//	}
-
-	//	// Normalize all normals
-	//	for (vec3<float>& normal : normals) {
-	//		normal = normalize3(normal);
-	//	}
-	//}
+	//specific for spheres. Normal is the line between vertex and center
 	void calculateNormals() {
 		normals.clear();
-		
 
-		for (auto& pos : positions) 
+
+		for (auto& pos : positions)
 		{
 			normals.push_back(normalize3(pos - center));
 		}
 	}
 
-	void drawLines() {
-		meshLines.draw();
-	}
-	void generatePositionsAndIndices(std::vector<unsigned int>& intermi) {
-		vector<p3> interm;
-		indices.clear();
-		int counter = 0;
-		for (const auto& i : intermi) 
-		{
-			interm.push_back(positions[i]);
-
-			
-			indices.push_back(counter);
-			counter++;
-			
-		}
-		positions = interm;
-	}
 
 	void draw() {
 

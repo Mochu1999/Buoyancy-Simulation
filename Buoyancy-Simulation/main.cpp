@@ -32,6 +32,8 @@
 #include "Pyramid.hpp"
 #include "Model.hpp"
 #include "Settings.hpp"
+#include "ReadStl.hpp"
+#include "Polyhedra.hpp"
 
 // to not render what is not visible to the camera:
 //glEnable(GL_CULL_FACE);       // Enable face culling
@@ -90,16 +92,21 @@ int main(void)
 
 
 	//writeModel(model);
-	model = readModel("new.bin");
+	model = readModel("gato.bin");
 	Polygons polygon;
 	polygon.addSet(model);
 
 
-	print(polygon.positions);
+	//print(polygon.positions);
 	//print(polygon.indices);
 
-
-
+	Polyhedra eiffel;
+	readSTL(eiffel.positions, eiffel.normals, "Eiffel.STL");
+	eiffel.simpleIndices();
+	print(eiffel.positions.size());
+	print(eiffel.normals.size());
+	print(eiffel.indices.size());
+	cout << "hola" << endl;
 
 	Sphere auxSphere(1);
 	auxSphere.addSet(polygon.centroid);
@@ -198,6 +205,8 @@ int main(void)
 
 	while (!glfwWindowShouldClose(window))
 	{
+		//break;
+
 		//system("cls");
 		if (isRunning)
 		{
@@ -244,16 +253,17 @@ int main(void)
 
 			glUniform1i(renderTypeLocation, 0);
 			glUniform4f(colorLocation, 40.0f / 255.0f, 239.9f / 255.0f, 239.0f / 255.0f, 1);
-			sphere.draw();
+			//sphere.draw();
+			eiffel.draw();
 			glUniform4f(colorLocation, 255.0f / 255.0f, 255.0f / 255.0f, 255.0f / 255.0f, 1);
 			//printflat(fourier.indices);
 			//fourier.createWavePositions();
 			//fourier.draw();
 			glUniform4f(colorLocation, 187.0f / 255.0f, 165.61f / 255.0f, 61.0f / 255.0f, 1);
-			pyramid.draw();
+			//pyramid.draw();
 			glUniform4f(colorLocation, 135.0f / 255.0f, 0.0, 0.0, 1);
 			glUniform4f(colorLocation, 255/ 255.0f, 0.0, 0.0, 1);
-			polygon.draw();
+			//polygon.draw();
 
 			glUniform1i(renderTypeLocation, 1);
 			glUniform4f(colorLocation, 0, 0, 1.0, 1.0);
@@ -266,8 +276,8 @@ int main(void)
 
 			glUniform4f(colorLocation, 1, 1, 1, 1.0);
 			light.draw();
-			auxSphere.draw();
-			polygon.lines.draw();
+			//auxSphere.draw();
+			//polygon.lines.draw();
 
 
 

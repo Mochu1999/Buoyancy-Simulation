@@ -2,8 +2,8 @@
 
 #include "Common.hpp"
 
+#include "SweepTriangulation.hpp"
 #include "Lines3d.hpp"
-
 
 
 //maybe remove some functionality of triangulation on its own .hpp
@@ -13,13 +13,13 @@ struct Polygons {
 
 	bool isBufferUpdated = false;
 
+
 	Lines3d lines;
 
 	//vector<p3> model;
 	vector<p3>& positions = lines.positions;
 	vector <unsigned int> indices; //triangle indices, do not mistake them with the lines indices
-	//METER COMO VARIABLE RELATIVA EN ADDSET
-	vector<p3> xyPositions; //the variable is rotated in addSet so the z value is equal for every point
+	SweepTrAux aux; 
 
 	unsigned int vertexBuffer;
 	unsigned int vertexArray;
@@ -34,21 +34,9 @@ struct Polygons {
 	size_t currentIndicesDataSize = 0;
 
 
-	//saves positions with its indices
-	struct StructuredPoints {
-		p point;
-		unsigned int index;
+	
 
-		StructuredPoints() : point({ 0,0 }), index(0) {} //initializing paramenters to 0 if not specified 
-
-		StructuredPoints(p point_, unsigned int index_)
-			: point(point_), index(index_) {}
-
-	};
-
-	//I'm letting these outside so I don't create references for the auxiliars of sweep
-	std::vector<std::deque<unsigned int>> chain;
-	std::vector<StructuredPoints> sPoints;
+	
 
 	float area = 0.0f;
 	p3 centroid;
@@ -84,11 +72,6 @@ struct Polygons {
 
 	void addSet(vector<p3> items);
 
-	void sweepTriangulation();
-
-	//auxiliar functions for sweepTriangulation
-	void trChainBack(const unsigned int& currentChain);
-	void trChainFront(const unsigned int& currentChain);
 
 
 	//void ConvexTriangulation();

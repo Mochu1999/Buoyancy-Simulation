@@ -941,6 +941,9 @@
     <ClInclude Include="Sources\SweepTriangulation.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\ReadStl.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Sources\glm\detail\func_common.inl">
@@ -1352,5 +1355,6 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="Resources\Shaders\shader1.shader" />
+    <None Include="..\..\..\Users\carlo\Downloads\Eiffel_tower_sample.STL" />
   </ItemGroup>
 </Project>

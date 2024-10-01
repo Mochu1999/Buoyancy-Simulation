@@ -436,7 +436,6 @@
     <ClInclude Include="Sources\Polygons.hpp" />
     <ClInclude Include="Sources\Polyhedra.hpp" />
     <ClInclude Include="Sources\Pyramid.hpp" />
-    <ClInclude Include="Sources\ReadStl.hpp" />
     <ClInclude Include="Sources\Settings.hpp" />
     <ClInclude Include="Sources\shader.h" />
     <ClInclude Include="Sources\Spheres.hpp" />
@@ -445,7 +444,6 @@
     <ClInclude Include="Sources\WettedSurface.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Users\carlo\Downloads\Eiffel_tower_sample.STL" />
     <None Include="Resources\Shaders\shader1.shader" />
     <None Include="Sources\glm\detail\func_common.inl" />
     <None Include="Sources\glm\detail\func_common_simd.inl" />

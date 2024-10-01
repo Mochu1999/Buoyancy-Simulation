@@ -32,7 +32,7 @@
 #include "Pyramid.hpp"
 #include "Model.hpp"
 #include "Settings.hpp"
-#include "ReadStl.hpp"
+
 #include "Polyhedra.hpp"
 
 // to not render what is not visible to the camera:
@@ -100,13 +100,21 @@ int main(void)
 	//print(polygon.positions);
 	//print(polygon.indices);
 
-	Polyhedra eiffel;
-	readSTL(eiffel.positions, eiffel.normals, "Eiffel.STL");
-	eiffel.simpleIndices();
-	print(eiffel.positions.size());
-	print(eiffel.normals.size());
-	print(eiffel.indices.size());
-	cout << "hola" << endl;
+	Polyhedra stl, bin;
+
+	TimeCounter tc1;
+	readSTL(stl.positions, stl.normals, "Eiffel.STL");
+	tc1.endCounter();
+
+	stl.simpleIndices();
+	
+
+	TimeCounter tc2;
+	readSimplePolyhedra(bin.positions, bin.normals, bin.indices, "Eiffel.bin");
+	tc2.endCounter();
+
+	print( tc1.endTime/ tc2.endTime);
+
 
 	Sphere auxSphere(1);
 	auxSphere.addSet(polygon.centroid);
@@ -205,7 +213,7 @@ int main(void)
 
 	while (!glfwWindowShouldClose(window))
 	{
-		//break;
+		break;
 
 		//system("cls");
 		if (isRunning)
@@ -254,7 +262,7 @@ int main(void)
 			glUniform1i(renderTypeLocation, 0);
 			glUniform4f(colorLocation, 40.0f / 255.0f, 239.9f / 255.0f, 239.0f / 255.0f, 1);
 			//sphere.draw();
-			eiffel.draw();
+			//eiffel.draw();
 			glUniform4f(colorLocation, 255.0f / 255.0f, 255.0f / 255.0f, 255.0f / 255.0f, 1);
 			//printflat(fourier.indices);
 			//fourier.createWavePositions();

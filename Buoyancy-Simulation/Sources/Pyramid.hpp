@@ -127,6 +127,10 @@ struct Pyramid {
 	}
 
 	Pyramid() {
+		for (auto& pos : positions)
+		{
+			pos += {0, 0, 60};
+		}
 		//rotate3D(positions, 0, 0, 0);
 
 		genBuffers();

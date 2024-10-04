@@ -10,7 +10,7 @@ struct WettedSurface
 {
 	struct Intersections {
 		p3 point;
-		unsigned int segment;
+		unsigned int segment;//to what vertex it corresponds
 		unsigned int imm; //immediate
 		Intersections() : point({ 0,0,0 }), segment(0), imm(0) {} //initializing paramenters to 0 if not specified 
 
@@ -21,7 +21,7 @@ struct WettedSurface
 
 	vector<Intersections> intersections;
 
-	Fourier& fourier;
+	Fourier& fourier; //SOBRA?
 	vector<p3>& fourierPositions = fourier.positions;
 	vector<unsigned int>& fourierIndices = fourier.indices;
 
@@ -43,6 +43,7 @@ struct WettedSurface
 	{
 		
 	}
+	//NO TENIAS UNA QUE NO USABA O(N^2)
 	//Finds all intersections and fills them  with intersections, segments and immediates 
 	void calculateIntersections() {
 

@@ -187,11 +187,10 @@ GLFWwindow* initialize() {
 	//glDepthFunc(GL_LESS);
 
 
-	//glEnable(GL_BLEND);//blend for alpha opacity, lets blending pixels in the same position
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);//blend for alpha opacity, lets blending pixels in the same position
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	////glEnable(GL_DEPTH_TEST);
-	////glDepthFunc(GL_LESS);
+
 
 	////// Enable polygon offset fill
 	////glEnable(GL_POLYGON_OFFSET_FILL);

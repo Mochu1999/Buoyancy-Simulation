@@ -441,6 +441,7 @@
     <ClInclude Include="Sources\Spheres.hpp" />
     <ClInclude Include="Sources\SweepTriangulation.hpp" />
     <ClInclude Include="Sources\Time.hpp" />
+    <ClInclude Include="Sources\TrWettedSurface.hpp" />
     <ClInclude Include="Sources\WettedSurface.hpp" />
   </ItemGroup>
   <ItemGroup>

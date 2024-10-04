@@ -7,7 +7,7 @@ struct Fourier {
 	vector<p3> positions;
 	vector<p3> normals;
 
-	int n = 10; //number of points in one axis of the square grid
+	int n = 2; //number of points in one axis of the square grid
 	int segments = n - 1;
 	float endPosition = 100;
 	float startPosition = 0;
@@ -44,21 +44,26 @@ struct Fourier {
 
 	float period = 3000;
 	float frecuency = 2 * PI / period;
-	float amplitude = 5;
+	float amplitude = 10;
 	float offset = 5;
-	float phase = PI/2;
+	float phase = PI / 2;
 	float phaseSpeed = 0.01;
 
 
 	Fourier() {
 		genBuffers();
 		createWavePositions();
-		calculateNormals();
+		//calculateNormals();
 		createIndices();
 		/*cout << "fourier: ";
 		printv3(positions);
 		printflat(indices);*/
-
+		print(positions);
+		print(normals);
+		print(indices);
+		print(positions.size());
+		print(normals.size());
+		print(indices.size());
 	}
 
 	float waveFunction(float x, float z) {
@@ -75,13 +80,14 @@ struct Fourier {
 		{
 			for (float x = startPosition; x <= endPosition; x += interval)
 			{
-				positions.emplace_back(p3{ x,waveFunction(x,z),z});
+				positions.emplace_back(p3{ x,waveFunction(x,z),z });
+
+				normals.emplace_back(calculateNormalFD(x, z));
 			}
 		}
 		phase += phaseSpeed;
 		isBufferUpdated = true;
 
-		
 
 		//lines
 		lines.clear();
@@ -92,6 +98,7 @@ struct Fourier {
 			lines[i / 3].addSet({ positions[indices[i]],positions[indices[i + 1]], positions[indices[i + 2]] });
 		}
 	}
+
 	//executed in the while loop
 	void updateWavePositions() {
 		size_t index = 0;
@@ -103,29 +110,53 @@ struct Fourier {
 		}
 		phase += phaseSpeed;
 		isBufferUpdated = true;
+
+
 	}
 
-	void calculateNormals() {
-		normals.clear();
-		normals.resize(positions.size(), { 0,0,0 });
+	//void calculateNormals() {
+	//	normals.clear();
+	//	normals.resize(positions.size(), { 0,0,0 });
 
-		for (int i = 0; i < indices.size(); i += 3) {
-			vec3<float> pos1 = positions[indices[i]];
-			vec3<float> pos2 = positions[indices[i + 1]];
-			vec3<float> pos3 = positions[indices[i + 2]];
+	//	for (int i = 0; i < indices.size(); i += 3) {
+	//		vec3<float> pos1 = positions[indices[i]];
+	//		vec3<float> pos2 = positions[indices[i + 1]];
+	//		vec3<float> pos3 = positions[indices[i + 2]];
 
-			vec3<float> normal = normalize3(cross3(pos2 - pos1, pos3 - pos1));
+	//		vec3<float> normal = normalize3(cross3(pos2 - pos1, pos3 - pos1));
 
-			normals[indices[i]] = normals[indices[i]]+ normal;
-			normals[indices[i + 1]] = normals[indices[i + 1]]+ normal;
-			normals[indices[i + 2]] = normals[indices[i + 2]]+ normal;
-		}
+	//		normals[indices[i]] = normals[indices[i]]+ normal;
+	//		normals[indices[i + 1]] = normals[indices[i + 1]]+ normal;
+	//		normals[indices[i + 2]] = normals[indices[i + 2]]+ normal;
+	//	}
 
-		// Normalize the normals
-		for (vec3<float>& normal : normals) {
-			normal = normalize3(normal);
-		}
+	//	// Normalize the normals
+	//	for (vec3<float>& normal : normals) {
+	//		normal = normalize3(normal);
+	//	}
+	//}
+	// Step size for finite difference (small value)
+	const float epsilon = 0.01f;
+
+	// Estimate the normal using finite differences
+	p3 calculateNormalFD(float x, float z) {
+		// Sample points nearby
+		float heightL = waveFunction(x - epsilon, z); // Left
+		float heightR = waveFunction(x + epsilon, z); // Right
+		float heightD = waveFunction(x, z - epsilon); // Down
+		float heightU = waveFunction(x, z + epsilon); // Up
+
+		// Compute the tangent vectors
+		p3 tangentX = { 2 * epsilon, heightR - heightL, 0 }; // X tangent (Left to Right)
+		p3 tangentZ = { 0, heightU - heightD, 2 * epsilon }; // Z tangent (Down to Up)
+
+		// Normal is the cross product of the two tangents
+		p3 normal = cross3(tangentX, tangentZ); // Note: Ensure the right-hand rule is followed
+
+		// Normalize the normal vector
+		return normalize3(normal);
 	}
+
 
 	void createIndices() {
 		indices.clear();
@@ -148,8 +179,8 @@ struct Fourier {
 	}
 
 	void draw() {
-		
-		calculateNormals();
+
+		//calculateNormals();
 
 		glBindVertexArray(vertexArray);
 

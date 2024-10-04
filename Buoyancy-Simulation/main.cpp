@@ -88,7 +88,7 @@ int main(void)
 
 	//BinariesManager binariesManager;
 
-	
+
 
 
 	//writeModel(model);
@@ -100,20 +100,20 @@ int main(void)
 	//print(polygon.positions);
 	//print(polygon.indices);
 
-	Polyhedra stl, bin;
+	/*Polyhedra stl, bin;
 
 	TimeCounter tc1;
 	readSTL(stl.positions, stl.normals, "Eiffel.STL");
 	tc1.endCounter();
 
 	stl.simpleIndices();
-	
+
 
 	TimeCounter tc2;
 	readSimplePolyhedra(bin.positions, bin.normals, bin.indices, "Eiffel.bin");
 	tc2.endCounter();
 
-	print( tc1.endTime/ tc2.endTime);
+	print( tc1.endTime/ tc2.endTime);*/
 
 
 	Sphere auxSphere(1);
@@ -142,7 +142,7 @@ int main(void)
 
 
 	Sphere sphere(40, 500);
-	sphere.addSet({ 00,00,-100 });
+	sphere.addSet({ 00,00,-50 });
 
 
 	/*Arrows arrows;
@@ -171,8 +171,9 @@ int main(void)
 
 
 
-	//Fourier fourier;
+	Fourier fourier;
 	//fourier.updateWavePositions();
+	//print(fourir)
 
 	//WettedSurface wettedSurface(polygon,fourier);
 
@@ -213,11 +214,14 @@ int main(void)
 
 	while (!glfwWindowShouldClose(window))
 	{
-		break;
+		//break;
 
 		//system("cls");
 		if (isRunning)
 		{
+			glEnable(GL_DEPTH_TEST);
+			glDepthMask(GL_TRUE);      //depth writing
+			glDisable(GL_BLEND);
 
 			glClearColor(0.035f, 0.065f, 0.085f, 1.0f);
 			//glClearColor(1, 1, 1, 1.0f);
@@ -225,6 +229,8 @@ int main(void)
 			//printv3(polygon.positions);
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			
 
 			glUniform1i(renderTypeLocation, 1);
 
@@ -260,17 +266,19 @@ int main(void)
 
 
 			glUniform1i(renderTypeLocation, 0);
+
+
 			glUniform4f(colorLocation, 40.0f / 255.0f, 239.9f / 255.0f, 239.0f / 255.0f, 1);
-			//sphere.draw();
+			sphere.draw();
 			//eiffel.draw();
+			//fourier.createWavePositions();
 			glUniform4f(colorLocation, 255.0f / 255.0f, 255.0f / 255.0f, 255.0f / 255.0f, 1);
 			//printflat(fourier.indices);
-			//fourier.createWavePositions();
-			//fourier.draw();
 			glUniform4f(colorLocation, 187.0f / 255.0f, 165.61f / 255.0f, 61.0f / 255.0f, 1);
+			//bin.draw();
 			//pyramid.draw();
 			glUniform4f(colorLocation, 135.0f / 255.0f, 0.0, 0.0, 1);
-			glUniform4f(colorLocation, 255/ 255.0f, 0.0, 0.0, 1);
+			glUniform4f(colorLocation, 255 / 255.0f, 0.0, 0.0, 1);
 			//polygon.draw();
 
 			glUniform1i(renderTypeLocation, 1);
@@ -286,6 +294,15 @@ int main(void)
 			light.draw();
 			//auxSphere.draw();
 			//polygon.lines.draw();
+
+			//transparent objects
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glDepthMask(GL_FALSE);
+
+			glUniform1i(renderTypeLocation, 0);
+			glUniform4f(colorLocation, 40.0f / 255.0f, 239.9f / 255.0f, 239.0f / 255.0f, 0.6);
+			fourier.draw();
 
 
 

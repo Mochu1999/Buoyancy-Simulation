@@ -276,7 +276,7 @@ int main(void)
 			//printflat(fourier.indices);
 			glUniform4f(colorLocation, 187.0f / 255.0f, 165.61f / 255.0f, 61.0f / 255.0f, 1);
 			//bin.draw();
-			//pyramid.draw();
+			pyramid.draw();
 			glUniform4f(colorLocation, 135.0f / 255.0f, 0.0, 0.0, 1);
 			glUniform4f(colorLocation, 255 / 255.0f, 0.0, 0.0, 1);
 			//polygon.draw();

@@ -70,6 +70,15 @@ struct Fourier {
 		return amplitude * sin(100 * x + phase) * sin(100 * z) + offset;
 		//return amplitude * sin(100 * x + phase) + offset;
 	}
+	// Precomputed partial derivative of waveFunction with respect to x
+	float waveDerivativeX(float x, float z) {
+		return amplitude * 100 * cos(100 * x + phase) * sin(100 * z);
+	}
+
+	// Precomputed partial derivative of waveFunction with respect to z
+	float waveDerivativeZ(float x, float z) {
+		return amplitude * 100 * sin(100 * x + phase) * cos(100 * z);
+	}
 
 	//this should only executed at the start
 	void createWavePositions() {
@@ -82,7 +91,6 @@ struct Fourier {
 			{
 				positions.emplace_back(p3{ x,waveFunction(x,z),z });
 
-				normals.emplace_back(calculateNormalFD(x, z));
 			}
 		}
 		phase += phaseSpeed;
@@ -97,6 +105,7 @@ struct Fourier {
 
 			lines[i / 3].addSet({ positions[indices[i]],positions[indices[i + 1]], positions[indices[i + 2]] });
 		}
+		calculateNormals();
 	}
 
 	//executed in the while loop
@@ -111,50 +120,31 @@ struct Fourier {
 		phase += phaseSpeed;
 		isBufferUpdated = true;
 
-
+		calculateNormals();
 	}
 
-	//void calculateNormals() {
-	//	normals.clear();
-	//	normals.resize(positions.size(), { 0,0,0 });
+	void calculateNormals() {
+		normals.clear();
+		normals.reserve(positions.size());
 
-	//	for (int i = 0; i < indices.size(); i += 3) {
-	//		vec3<float> pos1 = positions[indices[i]];
-	//		vec3<float> pos2 = positions[indices[i + 1]];
-	//		vec3<float> pos3 = positions[indices[i + 2]];
+		for (const auto& pos : positions) {
 
-	//		vec3<float> normal = normalize3(cross3(pos2 - pos1, pos3 - pos1));
+			// Normal vector N = (-dF/dx, 1, -dF/dz)
+			float dFdx = waveDerivativeX(pos.x, pos.z);
+			float dFdz = waveDerivativeZ(pos.x, pos.z);
 
-	//		normals[indices[i]] = normals[indices[i]]+ normal;
-	//		normals[indices[i + 1]] = normals[indices[i + 1]]+ normal;
-	//		normals[indices[i + 2]] = normals[indices[i + 2]]+ normal;
-	//	}
+			
 
-	//	// Normalize the normals
-	//	for (vec3<float>& normal : normals) {
-	//		normal = normalize3(normal);
-	//	}
-	//}
-	// Step size for finite difference (small value)
-	const float epsilon = 0.01f;
+			// Normal vector
+			p3 normal = { -dFdx, 1.0f, -dFdz };
 
-	// Estimate the normal using finite differences
-	p3 calculateNormalFD(float x, float z) {
-		// Sample points nearby
-		float heightL = waveFunction(x - epsilon, z); // Left
-		float heightR = waveFunction(x + epsilon, z); // Right
-		float heightD = waveFunction(x, z - epsilon); // Down
-		float heightU = waveFunction(x, z + epsilon); // Up
+			normals.push_back(normalize3(normal));
 
-		// Compute the tangent vectors
-		p3 tangentX = { 2 * epsilon, heightR - heightL, 0 }; // X tangent (Left to Right)
-		p3 tangentZ = { 0, heightU - heightD, 2 * epsilon }; // Z tangent (Down to Up)
-
-		// Normal is the cross product of the two tangents
-		p3 normal = cross3(tangentX, tangentZ); // Note: Ensure the right-hand rule is followed
-
-		// Normalize the normal vector
-		return normalize3(normal);
+			print(pos);
+			print(dFdx);
+			print(dFdz);
+			print(normal);
+		}
 	}
 
 

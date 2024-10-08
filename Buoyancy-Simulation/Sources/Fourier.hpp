@@ -4,10 +4,9 @@
 
 
 struct Fourier {
-	vector<p3> positions;
-	vector<p3> normals;
+	
 
-	int n = 2; //number of points in one axis of the square grid
+	int n = 20; //number of points in one axis of the square grid
 	int segments = n - 1;
 	float endPosition = 100;
 	float startPosition = 0;
@@ -16,11 +15,18 @@ struct Fourier {
 
 
 
+	float period = 3000;
+	float frecuency = 2 * PI / period;
+	float amplitude = 20;
+	float offset = 0;
+	float phase = 0;
+	float phaseSpeed = 0.01;
+
+
 	vector<Lines3d> lines;
-
-
 	vector<unsigned int> indices;
-
+	vector<p3> positions;
+	vector<p3> normals;
 
 	unsigned int vertexBuffer;
 	unsigned int vertexArray;
@@ -42,14 +48,6 @@ struct Fourier {
 	bool isBufferUpdated = false;
 	GLenum usageHint = GL_DYNAMIC_DRAW;
 
-	float period = 3000;
-	float frecuency = 2 * PI / period;
-	float amplitude = 10;
-	float offset = 5;
-	float phase = PI / 2;
-	float phaseSpeed = 0.01;
-
-
 	Fourier() {
 		genBuffers();
 		createWavePositions();
@@ -58,27 +56,21 @@ struct Fourier {
 		/*cout << "fourier: ";
 		printv3(positions);
 		printflat(indices);*/
-		print(positions);
+		/*print(positions);
 		print(normals);
-		print(indices);
+		print(indices);*/
 		print(positions.size());
 		print(normals.size());
 		print(indices.size());
 	}
 
 	float waveFunction(float x, float z) {
-		return amplitude * sin(100 * x + phase) * sin(100 * z) + offset;
+		//return amplitude * sin(100 * x + phase) * sin(100 * z) + offset;
 		//return amplitude * sin(100 * x + phase) + offset;
-	}
-	// Precomputed partial derivative of waveFunction with respect to x
-	float waveDerivativeX(float x, float z) {
-		return amplitude * 100 * cos(100 * x + phase) * sin(100 * z);
+		return amplitude * sin(100 * x);
+
 	}
 
-	// Precomputed partial derivative of waveFunction with respect to z
-	float waveDerivativeZ(float x, float z) {
-		return amplitude * 100 * sin(100 * x + phase) * cos(100 * z);
-	}
 
 	//this should only executed at the start
 	void createWavePositions() {
@@ -124,27 +116,28 @@ struct Fourier {
 	}
 
 	void calculateNormals() {
-		normals.clear();
-		normals.reserve(positions.size());
+		for (auto& pos : positions)
+		{
 
-		for (const auto& pos : positions) {
+		// Compute partial derivatives
+		float partialX = amplitude * 100 * cos(100 * pos.x);
+		float partialZ = amplitude * sin(100 * pos.x);
 
-			// Normal vector N = (-dF/dx, 1, -dF/dz)
-			float dFdx = waveDerivativeX(pos.x, pos.z);
-			float dFdz = waveDerivativeZ(pos.x, pos.z);
 
-			
 
-			// Normal vector
-			p3 normal = { -dFdx, 1.0f, -dFdz };
 
-			normals.push_back(normalize3(normal));
+		p3 vx = normalize3(p3{ 1,0,partialX });  // Tangent vector along x
+		p3 vz = normalize3(p3{ 0,1,partialZ});  // Tangent vector along z
 
-			print(pos);
-			print(dFdx);
-			print(dFdz);
-			print(normal);
+		// Cross product of vx and vz to get the normal
+		p3 normal = normalize3(cross3(vx, vz));
+		if (normal.y<0)
+			normals.push_back(p3{ -normal.x, -normal.y, -normal.z });
+		else
+			normals.push_back(normal);
+		
 		}
+		
 	}
 
 
@@ -169,8 +162,6 @@ struct Fourier {
 	}
 
 	void draw() {
-
-		//calculateNormals();
 
 		glBindVertexArray(vertexArray);
 
@@ -210,6 +201,7 @@ struct Fourier {
 
 
 		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
+
 	}
 
 
@@ -226,9 +218,9 @@ struct Fourier {
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, normalsBuffer);
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, normalsBuffer);
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
 		glBindVertexArray(0);
 	}
 

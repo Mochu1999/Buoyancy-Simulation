@@ -133,6 +133,11 @@ int main(void)
 
 	Settings settings(camera);
 
+	Fourier fourier;
+
+
+	//WettedSurface wettedSurface(polygon,fourier);
+
 
 	Pyramid pyramid;
 
@@ -141,12 +146,12 @@ int main(void)
 	light.addSet(lightPos);
 
 
-	Sphere sphere(40, 500);
-	sphere.addSet({ 00,00,-50 });
+	Sphere sphere(40, 10);
+	sphere.addSet({ 00,00,-80 });
 
 
-	/*Arrows arrows;
-	arrows.addSet(sphere.positions, sphere.normals);*/
+	Arrows arrows;
+	arrows.addSet(fourier.positions, fourier.normals);
 
 
 
@@ -171,11 +176,7 @@ int main(void)
 
 
 
-	Fourier fourier;
-	//fourier.updateWavePositions();
-	//print(fourir)
-
-	//WettedSurface wettedSurface(polygon,fourier);
+	
 
 
 
@@ -270,13 +271,14 @@ int main(void)
 
 			glUniform4f(colorLocation, 40.0f / 255.0f, 239.9f / 255.0f, 239.0f / 255.0f, 1);
 			sphere.draw();
+			fourier.draw();
 			//eiffel.draw();
 			//fourier.createWavePositions();
 			glUniform4f(colorLocation, 255.0f / 255.0f, 255.0f / 255.0f, 255.0f / 255.0f, 1);
 			//printflat(fourier.indices);
 			glUniform4f(colorLocation, 187.0f / 255.0f, 165.61f / 255.0f, 61.0f / 255.0f, 1);
 			//bin.draw();
-			pyramid.draw();
+			//pyramid.draw();
 			glUniform4f(colorLocation, 135.0f / 255.0f, 0.0, 0.0, 1);
 			glUniform4f(colorLocation, 255 / 255.0f, 0.0, 0.0, 1);
 			//polygon.draw();
@@ -288,7 +290,7 @@ int main(void)
 			//	line.draw();
 			//}
 			glUniform4f(colorLocation, 1, 0, 0, 1.0);
-			//arrows.draw();
+			arrows.draw();
 
 			glUniform4f(colorLocation, 1, 1, 1, 1.0);
 			light.draw();
@@ -302,7 +304,7 @@ int main(void)
 
 			glUniform1i(renderTypeLocation, 0);
 			glUniform4f(colorLocation, 40.0f / 255.0f, 239.9f / 255.0f, 239.0f / 255.0f, 0.6);
-			fourier.draw();
+			
 
 
 

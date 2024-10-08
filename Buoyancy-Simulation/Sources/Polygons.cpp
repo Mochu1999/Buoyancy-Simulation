@@ -86,8 +86,8 @@ void Polygons::addSet(vector<p3> items) {
 	centroidCalculation();
 	//polarAreaMomentOfInertia();
 
-	print(area);
-	print(centroid);
+	//print(area);
+	//print(centroid);
 	//the variable is rotated in addSet so the z value is equal for every point
 	vector<p3> xyPositions = positions;
 

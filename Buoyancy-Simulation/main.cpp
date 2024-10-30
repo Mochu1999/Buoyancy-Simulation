@@ -79,7 +79,6 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
 int main(void)
 {
-
 	GLFWwindow* window = initialize();
 
 	/*glDebugMessageCallback(MessageCallback, nullptr);
@@ -190,9 +189,13 @@ int main(void)
 	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	int locationMVP = glGetUniformLocation(shader.ID, "u_MVP");
+	int locationOrtho = glGetUniformLocation(shader.ID, "u_OrthoProjection");
+
+	int renderTypeLocation = glGetUniformLocation(shader.ID, "u_RenderType");
+	int location3d = glGetUniformLocation(shader.ID, "u_3d");
+
 	int locationView = glGetUniformLocation(shader.ID, "u_ViewMatrix");
 	int locationLightPos = glGetUniformLocation(shader.ID, "u_lightPos");
-	int renderTypeLocation = glGetUniformLocation(shader.ID, "u_RenderType");
 	int colorLocation = glGetUniformLocation(shader.ID, "u_Color");
 	int cameraPosition = glGetUniformLocation(shader.ID, "camPos");
 
@@ -201,7 +204,7 @@ int main(void)
 
 
 
-
+	glUniform1i(renderTypeLocation, 1);
 
 
 
@@ -220,20 +223,18 @@ int main(void)
 		//system("cls");
 		if (isRunning)
 		{
+			//opaque objects first
 			glEnable(GL_DEPTH_TEST);
 			glDepthMask(GL_TRUE);      //depth writing
 			glDisable(GL_BLEND);
 
 			glClearColor(0.035f, 0.065f, 0.085f, 1.0f);
-			//glClearColor(1, 1, 1, 1.0f);
-			//polygon.translate({ 0,0.1,0 });
-			//printv3(polygon.positions);
-
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			
 
 			glUniform1i(renderTypeLocation, 1);
+			glUniform1i(location3d, 1);
 
 			glUniform4f(colorLocation, 1.0, 1.0, 1.0, 1.0);
 			//groundLines.draw();

@@ -21,6 +21,8 @@ struct Camera {
 	std::array<float, 16> viewMatrix;
 	std::array<float, 16> vpMatrix;
 
+	std::array<float, 16> orthoMatrix;
+
 	p3 cameraPos;
 
 	//p3 forward = { 0.0f,-1.0f,0.0f }; //cuando dejó esto de funcionar?
@@ -37,7 +39,8 @@ struct Camera {
 
 
 
-	
+	array<float, 16> createOrthoMatrix();
+
 	////Perspective and View
 	array<float, 16> createPerspectiveMatrix();
 
@@ -49,14 +52,5 @@ struct Camera {
 	//takes the glfw inputs, executes the rotation and the translation, creates all the vector and updates the view and vp matrices
 	void updateCamera();
 
-
-
-	// auxiliary functions
-
-	/*std::array<float, 4> createQuaternion2(float angle, const p3& axis);
-	std::array<float, 4> inverseQuaternion2(const std::array<float, 4>& q);
-	std::array<float, 4> multiplyQuaternions2(const std::array<float, 4>& a, const std::array<float, 4>& b);*/
-
-	std::array<float, 16> multiplyMatrices(const std::array<float, 16>& a, const std::array<float, 16>& b);
 };
 

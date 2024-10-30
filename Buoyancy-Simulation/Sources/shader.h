@@ -17,13 +17,13 @@ struct Shader {
 
 	Shader(const std::string& filepath)
 		:filePath(filepath), ID(0) { //we are maintaining filePath only for debugging purpouses
-		ShaderProgramSource source = ParseShader(filepath);
-		ID = CreateShader(source.VertexSource, source.FragmentSource);
+		ShaderProgramSource source = parseShader(filepath);
+		ID = createShader(source.VertexSource, source.FragmentSource);
 
 		
 	}
 
-	ShaderProgramSource ParseShader(const string& filepath) { //Converts a .shader into 2 separate streams and each one into strings for glShaderSource in CompileShader
+	ShaderProgramSource parseShader(const string& filepath) { //Converts a .shader into 2 separate streams and each one into strings for glShaderSource in compileShader
 		ifstream stream(filepath);
 
 		enum class ShaderType {
@@ -51,7 +51,7 @@ struct Shader {
 	}
 
 
-	unsigned int CompileShader(unsigned int type, const string& source) {
+	unsigned int compileShader(unsigned int type, const string& source) {
 		unsigned int id = glCreateShader(type); //you specifies type of shader to create
 
 		const char* src = &source[0];//you will use this pointer to point to the start of your source, char bc string is in chars, equivalent to const char* src = source.c_str()
@@ -79,13 +79,13 @@ struct Shader {
 		return id;
 	}
 
-	unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader) { 	//creates shader with their string
+	unsigned int createShader(const std::string& vertexShader, const std::string& fragmentShader) { 	//creates shader with their string
 		unsigned int program = glCreateProgram();// A program object is an object to which shader objects can be attached   and returns a non-zero value by which it can be referenced (unless error, then 0)
 
 
-		unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
+		unsigned int vs = compileShader(GL_VERTEX_SHADER, vertexShader);
 		compileErrors(vs, "VERTEX SHADER");
-		unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
+		unsigned int fs = compileShader(GL_FRAGMENT_SHADER, fragmentShader);
 		compileErrors(fs, "VERTEX SHADER");
 
 
@@ -109,28 +109,6 @@ struct Shader {
 		glUseProgram(0);
 	}
 
-	
-
-	void SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3) {
-		int location = GetUniformLocation(name);
-		if (location != -1) { // Only set the uniform if it exists in the shader
-			glUniform4f(location, v0, v1, v2, v3);
-		}
-	}
-
-	int GetUniformLocation(const std::string& name) {
-		/*if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
-			return m_UniformLocationCache[name];
-		*/
-		//solo estaba esto de abajo antes de unordored map
-		int location = glGetUniformLocation(ID, name.c_str()); //The location represents a handle or identifier that OpenGL uses to identify and access a specific uniform variable//Without the location, OpenGL wouldn't know which uniform variable you are referring to when you call glUniform4f
-		if (location == -1) {//if location ==-1 it means it couldn't find the uniform, it can happen if the uniform is unused//But why do I need this line?
-			std::cout << "Warning " << name << " does not exist" << std::endl;
-		}
-
-		/*m_UniformLocationCache[name] = location; */
-		return location;
-	}
 
 	// Checks if the different Shaders have compiled properly
 	void compileErrors(unsigned int shader, const char* type)
@@ -199,6 +177,10 @@ GLFWwindow* initialize() {
 
 	return window;
 }
+
+
+
+
 
 //#define CHECK_GL_ERROR() {\
 //    GLenum err = glGetError();\

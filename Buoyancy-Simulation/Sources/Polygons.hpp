@@ -52,6 +52,9 @@ struct Polygons {
 
 	void draw();
 
+	void clear();
+	void addSet(vector<p3> items);
+
 
 	void calculateNormal() {
 		for (int i = 0; i < positions.size() - 1; i++)
@@ -64,13 +67,6 @@ struct Polygons {
 	
 
 
-	void clear();
-
-
-
-	
-
-	void addSet(vector<p3> items);
 
 
 

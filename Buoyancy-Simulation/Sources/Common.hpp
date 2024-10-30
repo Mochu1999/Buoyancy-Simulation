@@ -438,3 +438,6 @@ template<typename T>
 vec3<T> normal(const vec3<T>& p1, const vec3<T>& p2, const vec3<T>& p3) {
 	return normalize3(cross3(p2 - p1, p3 - p1));
 }
+
+
+std::array<float, 16> multiplyMatrices(const std::array<float, 16>& a, const std::array<float, 16>& b);

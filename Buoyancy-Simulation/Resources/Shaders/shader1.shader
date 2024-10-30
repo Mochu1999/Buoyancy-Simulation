@@ -7,25 +7,32 @@ layout(location = 1) in vec3 aNormal;
 
 //uniforms are universal variables that can be accessed from other shaders and in main without the use of a VAO
 uniform mat4 u_MVP;
+uniform mat4 u_OrthoProjection;
 
+uniform int u_3d;
 
 out vec3 Normal;  //Output that goes to the fragment shader
 out vec3 crntPos;
 
 
 void main() {
-    crntPos = aPos;
-    Normal = aNormal;
-     gl_Position = u_MVP * vec4(crntPos,1.0); //gl_Position is a keyword
+	if (u_3d == 1) //3d
+	{
+		crntPos = aPos;
+		Normal = aNormal;
+		gl_Position = u_MVP * vec4(crntPos,1.0); //gl_Position is a keyword
+	}
+	else if (u_3d == 0) //2d
+	{
+        gl_Position = u_OrthoProjection * vec4(aPos.xy, 0.0, 1.0);
+    }
+    
 }
 
 
 
 
 #shader fragment
-
-
-
 #version 330 core
 
 
@@ -33,8 +40,6 @@ out vec4 FragColor;
 
 in vec3 Normal;
 in vec3 crntPos;
-
-//flat in vec3 Normal;  // Ensure you use flat shading for normals
 
 vec4 lightColor = vec4(1.0, 1.0, 1.0, 1.0);
 

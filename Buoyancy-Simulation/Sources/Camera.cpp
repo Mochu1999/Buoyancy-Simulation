@@ -108,20 +108,6 @@ void Camera::updateCamera() {
 
 
 
-std::array<float, 16> Camera::multiplyMatrices(const std::array<float, 16>& a, const std::array<float, 16>& b) {
-	std::array<float, 16> output = {};
 
-	for (int i = 0; i < 4; ++i) { // row index
-		for (int j = 0; j < 4; ++j) { // column index
-			output[j * 4 + i] =
-				a[0 * 4 + i] * b[j * 4 + 0] +
-				a[1 * 4 + i] * b[j * 4 + 1] +
-				a[2 * 4 + i] * b[j * 4 + 2] +
-				a[3 * 4 + i] * b[j * 4 + 3];
-		}
-	}
-
-	return output;
-}
 
 

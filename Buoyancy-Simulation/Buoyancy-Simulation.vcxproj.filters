@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Sources\glm\detail\glm.cpp">
@@ -881,13 +881,13 @@
     <ClInclude Include="Sources\glm\vector_relational.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\auxiliary_elements.h">
+    <ClInclude Include="Sources\auxiliary_elements.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Sources\AuxSquare.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\BinariesManager.h">
+    <ClInclude Include="Sources\BinariesManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Camera.hpp">
@@ -908,13 +908,13 @@
     <ClInclude Include="Sources\Polygons.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\shader.h">
+    <ClInclude Include="Sources\Shader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Sources\WettedSurface.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Delaunay_2D.hpp">
+    <ClInclude Include="Sources\Delaunay2D.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Spheres.hpp">
@@ -941,7 +941,7 @@
     <ClInclude Include="Sources\SweepTriangulation.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\TrWettedSurface.hpp">
+    <ClInclude Include="Sources\Polygons2D.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

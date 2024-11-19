@@ -33,6 +33,7 @@ struct Camera {
 
 	Camera(GLFWwindow* window_) :window(window_) {
 
+		orthoMatrix = createOrthoMatrix();
 		perspectiveMatrix = createPerspectiveMatrix();
 	}
 
@@ -49,8 +50,25 @@ struct Camera {
 	//the rotations create a new forward vector and the other 2 are deduced from it
 	void calculateForward(p3& forward, const float rotationSpeed, const p3& rotationAxis);
 
-	//takes the glfw inputs, executes the rotation and the translation, creates all the vector and updates the view and vp matrices
+	//takes the glfw inputs, executes the rotation and the translation,
+	void updateKeys();
+
+	//creates all the vector and updates the view and vp matrices
 	void updateCamera();
 
+
+
+
+
+	float xpos, ypos;
+	double xpos1, ypos1;
+
+	void getPos(GLFWwindow* window) {
+		glfwGetCursorPos(window, &xpos1, &ypos1);
+		ypos1 = windowHeight - ypos1;
+		xpos = (float)xpos1;
+		ypos = (float)ypos1;
+	}
 };
 
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);

@@ -5,12 +5,12 @@
 
 //saves positions with its indices
 struct StructuredPoints {
-	p point;
+	p2 point;
 	unsigned int index;
 
 	StructuredPoints() : point({ 0,0 }), index(0) {} //initializing paramenters to 0 if not specified 
 
-	StructuredPoints(p point_, unsigned int index_)
+	StructuredPoints(p2 point_, unsigned int index_)
 		: point(point_), index(index_) {}
 
 };

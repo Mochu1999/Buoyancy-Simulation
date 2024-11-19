@@ -39,7 +39,7 @@ constexpr double invPI = 1.0f/PI;
 constexpr float inv3 = 1.0f / 3.0f;
 constexpr float inv180 = 1.0f / 180.0f;
 
-//global variables are after vec3
+/////////////////////////////global variables are after vec3
 
 template<typename T>
 struct vec2 {
@@ -107,13 +107,13 @@ struct vec2 {
 
 
 
-using p = vec2<float>;
+using p2 = vec2<float>;
 using ui2 = vec2<unsigned int>;
 
 //needed for the unordered_maps that take p as keys, it could be inside vec2, but this is more idiomatic
 //umaps have average looking times of O(1), compared with O(logn) of map
 struct p_hash {
-	std::size_t operator()(const p& point) const {
+	std::size_t operator()(const p2& point) const {
 		return std::hash<float>()(point.x) ^ (std::hash<float>()(point.y) << 1);
 	}
 };
@@ -121,7 +121,7 @@ struct p_hash {
 
 //there are a lot of hash functions, 
 struct p_HashMultiplicative {
-	std::size_t operator()(const p& point) const {
+	std::size_t operator()(const p2& point) const {
 		constexpr std::uint64_t k = 0x9ddfea08eb382d69ULL;
 		std::uint64_t a, b;
 
@@ -133,7 +133,7 @@ struct p_HashMultiplicative {
 };
 
 struct pair_hash_multiplicative {
-	std::size_t operator()(const std::pair<p, p>& edge) const {
+	std::size_t operator()(const std::pair<p2, p2>& edge) const {
 		p_HashMultiplicative ph;
 		std::size_t h1 = ph(edge.first);
 		std::size_t h2 = ph(edge.second);
@@ -269,9 +269,9 @@ float magnitude3(const vec3<T>& v) {
 
 
 
-
+/////////////////////////////////////////////
 // Declarations of global variables
-extern p cursor;
+extern p2 cursor;
 extern float windowHeight;
 extern float windowWidth;
 extern bool isRunning;
@@ -404,7 +404,7 @@ T degrees(T input) {
 
 
 //consts, cambiale el nombre y deja el nombre "is" para bools
-float isRightOfLine(p& A, p& B, p& P);
+float isRightOfLine(p2& A, p2& B, p2& P);
 
 
 

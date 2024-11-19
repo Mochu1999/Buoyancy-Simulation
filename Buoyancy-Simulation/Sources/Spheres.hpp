@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Common.hpp"
-#include "Delaunay_2D.hpp"
+#include "Delaunay2D.hpp"
 #include "Lines3d.hpp"
 
 //Creates the points of a Fibonacci Sphere with n points and a defined radius
@@ -31,8 +31,8 @@ std::vector<p3> addFibSphere(int n, float radius) {
 	return points;
 }
 
-std::vector<p> stereographicProjection(const std::vector<p3>& positions) {
-	std::vector<p> projectedPoints;
+std::vector<p2> stereographicProjection(const std::vector<p3>& positions) {
+	std::vector<p2> projectedPoints;
 	projectedPoints.reserve(positions.size());
 
 	for (const auto& point : positions) {
@@ -45,7 +45,7 @@ std::vector<p> stereographicProjection(const std::vector<p3>& positions) {
 
 		float projectionScale = 2.0 / (1.0 + ny);  // Standard stereographic projection formula
 
-		p projectedPoint;
+		p2 projectedPoint;
 		projectedPoint.x = projectionScale * nx;
 
 		projectedPoint.y = projectionScale * nz;
@@ -104,7 +104,7 @@ struct Sphere {
 
 
 
-		std::vector<p> projectedPoints = stereographicProjection(model);
+		std::vector<p2> projectedPoints = stereographicProjection(model);
 
 
 		vector<unsigned int> lidIndices; //need to output the indices for the lid for the second iteration
@@ -112,11 +112,11 @@ struct Sphere {
 
 
 
-		vector<p> lidPoints;
+		vector<p2> lidPoints;
 		for (const auto& i : lidIndices)
 		{
 			//already projected
-			lidPoints.push_back(p{ model[i].x,model[i].z });
+			lidPoints.push_back(p2{ model[i].x,model[i].z });
 
 		}
 		vector<Triangle> delaunay2 = bowyerWatson(lidPoints);

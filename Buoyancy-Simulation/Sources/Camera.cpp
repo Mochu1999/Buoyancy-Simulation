@@ -1,5 +1,26 @@
 #include "Camera.hpp"
 
+array<float, 16> Camera::createOrthoMatrix() {
+	array<float, 16> orthoMatrix = {};
+
+	float left = 0.0f;
+	float right = windowWidth;
+	float bottom = 0.0f;
+	float top = windowHeight;
+	float nearZ = -1.0f;
+	float farZ = 1.0f;
+
+	orthoMatrix[0] = 2.0f / (right - left);
+	orthoMatrix[5] = 2.0f / (top - bottom);
+	orthoMatrix[10] = -2.0f / (farZ - nearZ);
+	orthoMatrix[12] = -(right + left) / (right - left);
+	orthoMatrix[13] = -(top + bottom) / (top - bottom);
+	orthoMatrix[14] = -(farZ + nearZ) / (farZ - nearZ);
+	orthoMatrix[15] = 1.0f;
+
+	return orthoMatrix;
+}
+
 array<float, 16> Camera::createPerspectiveMatrix() {
 	array<float, 16> perspectiveMatrix = {};
 
@@ -58,8 +79,7 @@ void Camera::calculateForward(p3& forward, const float rotationSpeed, const p3& 
 		forward = intermForward;
 }
 
-void Camera::updateCamera() {
-
+void Camera::updateKeys() {
 	// Rotation
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 		calculateForward(forward, rotationSpeed, right);
@@ -92,7 +112,9 @@ void Camera::updateCamera() {
 
 	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
 		cameraPos.y -= translationSpeed;
+}
 
+void Camera::updateCamera() {
 
 	//The quaternion method is intentionally incomplete. The true method would calculate the f and u for pitch and f and r for yaw
 	// But instead of calculating everything there we are only calculating f and here forcing right to be with respect of the referenceUp
@@ -110,4 +132,14 @@ void Camera::updateCamera() {
 
 
 
-
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	if (action == GLFW_PRESS)
+	{
+		switch (key)
+		{
+		case GLFW_KEY_P:
+			isRunning = !isRunning;
+			break;
+		}
+	}
+}

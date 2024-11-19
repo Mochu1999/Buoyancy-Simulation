@@ -4,6 +4,7 @@
 // Assigns the slots in the Vertex Attribute Array where these attributes (position and normal) go
 layout(location = 0) in vec3 aPos; 
 layout(location = 1) in vec3 aNormal;
+layout(location = 2) in vec2 pos2D;
 
 //uniforms are universal variables that can be accessed from other shaders and in main without the use of a VAO
 uniform mat4 u_MVP;
@@ -24,7 +25,7 @@ void main() {
 	}
 	else if (u_3d == 0) //2d
 	{
-        gl_Position = u_OrthoProjection * vec4(aPos.xy, 0.0, 1.0);
+        gl_Position = u_OrthoProjection * vec4(pos2D, 0.0, 1.0);
     }
     
 }

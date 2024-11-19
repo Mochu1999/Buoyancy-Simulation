@@ -7,19 +7,20 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "shader.h"
+#include "Shader.hpp"
 
 #include "lines3d.hpp"
 #include "Fourier.hpp"
 
 #include "Camera.hpp"
 
-#include "auxiliary_elements.h"
+#include "auxiliary_elements.hpp"
 
-#include "BinariesManager.h"
+#include "BinariesManager.hpp"
 #include "KeyMouseImputs.hpp"
 
 #include "Polygons.hpp"
+#include "Polygons2D.hpp"
 
 #include "WettedSurface.hpp"
 
@@ -27,7 +28,7 @@
 
 #include "Spheres.hpp"
 
-#include "Delaunay_2D.hpp"
+#include "Delaunay2D.hpp"
 #include "Arrows.hpp"
 #include "Pyramid.hpp"
 #include "Model.hpp"
@@ -45,8 +46,7 @@
 
 using namespace std::chrono;
 
-float xpos, ypos;
-double xpos1, ypos1;
+
 
 struct AllPointers {
 	BinariesManager* binariesManager;
@@ -55,25 +55,10 @@ struct AllPointers {
 
 
 
-void getPos(GLFWwindow* window) {
-	glfwGetCursorPos(window, &xpos1, &ypos1);
-	ypos1 = windowHeight - ypos1;
-	xpos = (float)xpos1;
-	ypos = (float)ypos1;
-}
 
 
-void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	if (action == GLFW_PRESS)
-	{
-		switch (key)
-		{
-		case GLFW_KEY_P:
-			isRunning = !isRunning;
-			break;
-		}
-	}
-}
+
+
 
 
 
@@ -168,7 +153,7 @@ int main(void)
 
 
 
-
+	Polygons2D p2d;
 
 
 
@@ -194,22 +179,26 @@ int main(void)
 	int renderTypeLocation = glGetUniformLocation(shader.ID, "u_RenderType");
 	int location3d = glGetUniformLocation(shader.ID, "u_3d");
 
-	int locationView = glGetUniformLocation(shader.ID, "u_ViewMatrix");
-	int locationLightPos = glGetUniformLocation(shader.ID, "u_lightPos");
 	int colorLocation = glGetUniformLocation(shader.ID, "u_Color");
+
+	int locationLightPos = glGetUniformLocation(shader.ID, "u_lightPos");
 	int cameraPosition = glGetUniformLocation(shader.ID, "camPos");
 
 	glUniform3f(locationLightPos, lightPos.x, lightPos.y, lightPos.z);
-	glUniform4f(glGetUniformLocation(shader.ID, "u_Color"), 0, 1, 0, 1);
 
 
 
-	glUniform1i(renderTypeLocation, 1);
+
+
+	//SEPARATE THE LOGIC OF THE KEYS FROM UPDATECAMERA
+	camera.updateCamera();
+	glUniform3f(cameraPosition, camera.cameraPos.x, camera.cameraPos.y, camera.cameraPos.z);
+	glUniformMatrix4fv(locationMVP, 1, GL_FALSE, camera.vpMatrix.data());
+	glUniformMatrix4fv(locationOrtho, 1, GL_FALSE, camera.orthoMatrix.data());
 
 
 
 	int counter = 0;
-
 
 
 	//glfwSetMouseButtonCallback(window, mouseButtonCallback);
@@ -312,26 +301,21 @@ int main(void)
 			//sphere.drawLines();
 			//sphere.draw();
 
+			//2d objects
+			glUniform1i(location3d, 0);
+			glUniform1i(renderTypeLocation, 1);
+			glUniform4f(colorLocation, 40.0f / 255.0f, 239.9f / 255.0f, 239.0f / 255.0f, 0.6);
+			p2d.draw();
+
+			camera.updateKeys();
 			camera.updateCamera();
-			//glUniform3f(glGetUniformLocation(shader.ID, "camPos"), camera.cameraPos.x, camera.cameraPos.y, camera.cameraPos.z);
 			glUniform3f(cameraPosition, camera.cameraPos.x, camera.cameraPos.y, camera.cameraPos.z);
 			glUniformMatrix4fv(locationMVP, 1, GL_FALSE, camera.vpMatrix.data());
-			glUniformMatrix4fv(locationView, 1, GL_FALSE, camera.viewMatrix.data());
-
+			glUniformMatrix4fv(locationOrtho, 1, GL_FALSE, camera.orthoMatrix.data());
 
 
 			//printp3(camera.forward);
 			//printp3(camera.cameraPos);
-
-
-
-
-
-
-
-
-			//glUniform4f(colorLocation, 1.0f, 1.0f, 1.0f, 0.4f);
-			//groundLines.draw();//anisotropic filtering
 
 
 

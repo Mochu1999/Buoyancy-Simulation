@@ -6,7 +6,6 @@
 #include "Lines3d.hpp"
 
 
-//maybe remove some functionality of triangulation on its own .hpp
 
 struct Polygons {
 	GLenum usageHint = GL_DYNAMIC_DRAW;

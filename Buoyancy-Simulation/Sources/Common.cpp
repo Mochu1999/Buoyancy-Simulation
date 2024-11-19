@@ -3,7 +3,7 @@
 
 
 //Variables
-p cursor = { 0, 0 };
+p2 cursor = { 0, 0 };
 float windowHeight = 1080;
 float windowWidth = 1920;
 bool isRunning = true;
@@ -31,9 +31,9 @@ void getCursorPos(GLFWwindow* window) {
 
 }
 
-float isRightOfLine(p& A, p& B, p& P) {		 //is P to the right of AB?
-	p AB = { B.x - A.x,  B.y - A.y };
-	p AP = { P.x - A.x, P.y - A.y };
+float isRightOfLine(p2& A, p2& B, p2& P) {		 //is P to the right of AB?
+	p2 AB = { B.x - A.x,  B.y - A.y };
+	p2 AP = { P.x - A.x, P.y - A.y };
 
 	return AB.x * AP.y - AB.y * AP.x;	//if negative it is to its right, if 0, P is on the infinite line of AB
 }
